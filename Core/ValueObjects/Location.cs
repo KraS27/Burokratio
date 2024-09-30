@@ -1,4 +1,5 @@
-﻿using Core.Primitives;
+﻿using Core.Errors;
+using Core.Primitives;
 
 namespace Core.ValueObjects
 {
@@ -10,6 +11,15 @@ namespace Core.ValueObjects
         public const int STREET_MAX_LENGTH = 256;
         public const int POSTALCODE_MAX_LENGTH = 16;
 
+        private Location(string division, string country, string city, string street, string postalCode)
+        {
+            Division = division;
+            Country = country;
+            City = city;
+            Street = street;
+            PostalCode = postalCode;
+        }
+
         public string Division { get; } = null!;
 
         public string Country { get; } = null!;
@@ -20,6 +30,8 @@ namespace Core.ValueObjects
 
         public string PostalCode { get; } = null!;
 
+        
+
         public override IEnumerable<object> GetAtomicValues()
         {
             yield return Division;
@@ -29,9 +41,31 @@ namespace Core.ValueObjects
             yield return PostalCode;
         }
 
-        public static Result Create(string division, string country, string city, string street, string postalCode)
+        public static Result<Location> Create(string division, string country, string city, string street, string postalCode)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(division) ||
+                division.Length > DIVISION_MAX_LENGTH)
+                return Result<Location>.Failure(LocationErrors.InvalidDivision());
+
+            if (string.IsNullOrEmpty(country) ||
+                division.Length > CITY_MAX_LENGTH)
+                return Result<Location>.Failure(LocationErrors.InvalidCountry());
+
+            if (string.IsNullOrEmpty(city) ||
+                division.Length > CITY_MAX_LENGTH)
+                return Result<Location>.Failure(LocationErrors.InvalidCity());
+
+            if (string.IsNullOrEmpty(street) ||
+                division.Length > STREET_MAX_LENGTH)
+                return Result<Location>.Failure(LocationErrors.InvalidStreet());
+
+            if (string.IsNullOrEmpty(postalCode) ||
+                division.Length > POSTALCODE_MAX_LENGTH)
+                return Result<Location>.Failure(LocationErrors.InvalidPostalCode());
+
+            var location = new Location(division, country, city, street, postalCode);
+
+            return Result<Location>.Success(location);
         }
     }
 }

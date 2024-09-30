@@ -1,15 +1,31 @@
 ﻿namespace Core.Primitives
 {
-    public class Result
+    public class Result<TValue>
     {
-        public Result(bool isSuccess, Error? error)
+        public Result(TValue value)
+        {           
+            Value = value;
+            IsSuccess = true;
+            Error = Error.None;
+        }
+
+        public Result(Error error)
+        {;
+            IsSuccess = false;
+            Error = error;
+        }
+
+        public Result(TValue value, bool isSuccess, Error? error)
         {
-            if(isSuccess && error != Error.None || !isSuccess && error == Error.None)
+            if (isSuccess && error != Error.None || !isSuccess && error == Error.None)
                 throw new ArgumentException("Invalid error;", nameof(error));
 
+            Value = value;
             IsSuccess = isSuccess;
             Error = error;
         }
+
+        public TValue Value { get; }
 
         public bool IsSuccess { get; }
 
@@ -17,8 +33,8 @@
 
         public bool IsFailure => !IsSuccess;
 
-        public static Result Success() => new(true, Error.None);
+        public static Result<TValue> Success(TValue value) => new(value);
 
-        public static Result Failure(Error error) => new(false, error);
+        public static Result<TValue> Failure(Error error) => new( error);
     }
 }
