@@ -5,10 +5,12 @@ namespace Core.Entities
 {
     public class Notar : Entity
     {
-        public string Name { get; private set; } = null!;
+        public string Name { get;  } = null!;
 
-        public Location Location { get; private set; } = null!;
+        public Address Location { get;  } = null!;
         
+        public Coordinates Coordinates { get; } = null!;
 
+        public 
     }
 }

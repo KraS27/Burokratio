@@ -3,7 +3,7 @@ using Core.Primitives;
 
 namespace Core.ValueObjects
 {
-    public sealed class Location : ValueObject
+    public sealed class Address : ValueObject
     {
         public const int DIVISION_MAX_LENGTH = 128;
         public const int COUNTRY_MAX_LENGTH = 128;
@@ -11,7 +11,7 @@ namespace Core.ValueObjects
         public const int STREET_MAX_LENGTH = 256;
         public const int POSTALCODE_MAX_LENGTH = 16;
 
-        private Location(string division, string country, string city, string street, string postalCode)
+        private Address(string division, string country, string city, string street, string postalCode)
         {
             Division = division;
             Country = country;
@@ -40,29 +40,29 @@ namespace Core.ValueObjects
             yield return PostalCode;
         }
 
-        public static Result<Location> Create(string division, string country, string city, string street, string postalCode)
+        public static Result<Address> Create(string division, string country, string city, string street, string postalCode)
         {
             if (string.IsNullOrEmpty(division) ||
                 division.Length > DIVISION_MAX_LENGTH)
-                return LocationErrors.InvalidDivision();
+                return AddressErrors.InvalidDivision();
 
             if (string.IsNullOrEmpty(country) ||
                 country.Length > CITY_MAX_LENGTH)
-                return LocationErrors.InvalidCountry();
+                return AddressErrors.InvalidCountry();
 
             if (string.IsNullOrEmpty(city) ||
                 city.Length > CITY_MAX_LENGTH)
-                return LocationErrors.InvalidCity();
+                return AddressErrors.InvalidCity();
 
             if (string.IsNullOrEmpty(street) ||
                 street.Length > STREET_MAX_LENGTH)
-                return LocationErrors.InvalidStreet();
+                return AddressErrors.InvalidStreet();
 
             if (string.IsNullOrEmpty(postalCode) ||
                 postalCode.Length > POSTALCODE_MAX_LENGTH)
-                return LocationErrors.InvalidPostalCode();
+                return AddressErrors.InvalidPostalCode();
 
-            var location = new Location(division, country, city, street, postalCode);
+            var location = new Address(division, country, city, street, postalCode);
 
             return location;
         }
