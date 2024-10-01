@@ -31,7 +31,6 @@ namespace Core.ValueObjects
         public string PostalCode { get; } = null!;
 
         
-
         public override IEnumerable<object> GetAtomicValues()
         {
             yield return Division;
@@ -45,27 +44,27 @@ namespace Core.ValueObjects
         {
             if (string.IsNullOrEmpty(division) ||
                 division.Length > DIVISION_MAX_LENGTH)
-                return Result<Location>.Failure(LocationErrors.InvalidDivision());
+                return LocationErrors.InvalidDivision();
 
             if (string.IsNullOrEmpty(country) ||
-                division.Length > CITY_MAX_LENGTH)
-                return Result<Location>.Failure(LocationErrors.InvalidCountry());
+                country.Length > CITY_MAX_LENGTH)
+                return LocationErrors.InvalidCountry();
 
             if (string.IsNullOrEmpty(city) ||
-                division.Length > CITY_MAX_LENGTH)
-                return Result<Location>.Failure(LocationErrors.InvalidCity());
+                city.Length > CITY_MAX_LENGTH)
+                return LocationErrors.InvalidCity();
 
             if (string.IsNullOrEmpty(street) ||
-                division.Length > STREET_MAX_LENGTH)
-                return Result<Location>.Failure(LocationErrors.InvalidStreet());
+                street.Length > STREET_MAX_LENGTH)
+                return LocationErrors.InvalidStreet();
 
             if (string.IsNullOrEmpty(postalCode) ||
-                division.Length > POSTALCODE_MAX_LENGTH)
-                return Result<Location>.Failure(LocationErrors.InvalidPostalCode());
+                postalCode.Length > POSTALCODE_MAX_LENGTH)
+                return LocationErrors.InvalidPostalCode();
 
             var location = new Location(division, country, city, street, postalCode);
 
-            return Result<Location>.Success(location);
+            return location;
         }
     }
 }

@@ -10,10 +10,13 @@
         }
 
         public Result(Error error)
-        {;
+        {
             IsSuccess = false;
             Error = error;
         }
+
+        public static implicit operator Result<TValue>(TValue value) => new(value);
+        public static implicit operator Result<TValue>(Error error) => new(error);
 
         public Result(TValue value, bool isSuccess, Error? error)
         {
