@@ -26,7 +26,7 @@ namespace Core.ValueObjects
             yield return Longitude;
         }
 
-        public Result<Coordinates> Create(double latitude, double longitude)
+        public static Result<Coordinates> Create(double latitude, double longitude)
         {
             if (latitude < MIN_LATITUDE_VAUE || latitude > MAX_LATITUDE_VAUE)
                 return CoordinatesErrors.InvalidLatitude();

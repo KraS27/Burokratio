@@ -1,8 +1,8 @@
-﻿
-using Core.Errors;
+﻿using Core.Errors;
+using Core.Primitives;
 using System.Text.RegularExpressions;
 
-namespace Core.Primitives
+namespace Core.ValueObjects
 {
     public class Email : ValueObject
     {
@@ -17,12 +17,12 @@ namespace Core.Primitives
             Value = value;
         }
 
-        public Result<Email> Create(string input)
+        public static Result<Email> Create(string input)
         {
             if (string.IsNullOrWhiteSpace(input) || input.Length > MAX_LENGTH)
                 return EmailErrors.InvalidEmailLength();
 
-            if(Regex.IsMatch(input, emailRegex) == false)
+            if (Regex.IsMatch(input, emailRegex) == false)
                 return EmailErrors.InvalidEmailValue();
 
             var email = input;

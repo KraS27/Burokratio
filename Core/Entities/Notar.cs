@@ -16,5 +16,19 @@ namespace Core.Entities
         public Email Email { get; } = null!;
 
         public PhoneNumber? PhoneNumber { get; }
+
+        private Notar(string name, Address location, Coordinates coordinates, Email email, PhoneNumber? phoneNumber)
+        {
+            Name = name;
+            Location = location;
+            Coordinates = coordinates;
+            Email = email;
+            PhoneNumber = phoneNumber;
+        }
+
+        public static Result<Notar> Create(string name, Address location, Coordinates coordinates, Email email, PhoneNumber? phoneNumber)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

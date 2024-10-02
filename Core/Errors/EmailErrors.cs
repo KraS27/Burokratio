@@ -1,4 +1,5 @@
 ﻿using Core.Primitives;
+using Core.ValueObjects;
 
 namespace Core.Errors
 {
