@@ -13,7 +13,7 @@ namespace Core.Entities
         
         public Coordinates Coordinates { get; } = null!;
 
-        public string Email { get; } = null!;
+        public Email Email { get; } = null!;
 
         public PhoneNumber? PhoneNumber { get; }
     }

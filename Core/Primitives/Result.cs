@@ -28,7 +28,7 @@
             Error = error;
         }
 
-        public TValue Value { get; }
+        public TValue? Value { get; }
 
         public bool IsSuccess { get; }
 
