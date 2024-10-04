@@ -18,7 +18,14 @@ namespace Core.Entities
 
         public PhoneNumber? PhoneNumber { get; }
 
-        private Notar(string name, Address address, Coordinates coordinates, Email email, PhoneNumber? phoneNumber)
+        private Notar(Guid id, 
+            string name, 
+            Address address, 
+            Coordinates coordinates,
+            Email email,
+            PhoneNumber? phoneNumber, 
+            DateTimeOffset createdAt, 
+            DateTimeOffset updatedAt)
         {
             Name = name;
             Address = address;
@@ -32,7 +39,15 @@ namespace Core.Entities
             if (string.IsNullOrWhiteSpace(name) || name.Length > MAX_NAME_LENGTH)
                 return NotarErrors.InvalidName();
 
-            var notar = new Notar(name, address, coordinates, email, phoneNumber);
+            var notar = new Notar(
+                Guid.NewGuid(),
+                name, 
+                address, 
+                coordinates,
+                email, 
+                phoneNumber,
+                DateTimeOffset.Now,
+                DateTimeOffset.Now);
 
             return notar;
         }
