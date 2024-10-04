@@ -1,4 +1,5 @@
-﻿using Core.Primitives;
+﻿using Core.Errors;
+using Core.Primitives;
 using Core.ValueObjects;
 
 namespace Core.Entities
@@ -9,7 +10,7 @@ namespace Core.Entities
 
         public string Name { get;  } = null!;
 
-        public Address Location { get;  } = null!;
+        public Address Address { get;  } = null!;
         
         public Coordinates Coordinates { get; } = null!;
 
@@ -17,18 +18,23 @@ namespace Core.Entities
 
         public PhoneNumber? PhoneNumber { get; }
 
-        private Notar(string name, Address location, Coordinates coordinates, Email email, PhoneNumber? phoneNumber)
+        private Notar(string name, Address address, Coordinates coordinates, Email email, PhoneNumber? phoneNumber)
         {
             Name = name;
-            Location = location;
+            Address = address;
             Coordinates = coordinates;
             Email = email;
             PhoneNumber = phoneNumber;
         }
 
-        public static Result<Notar> Create(string name, Address location, Coordinates coordinates, Email email, PhoneNumber? phoneNumber)
+        public static Result<Notar> Create(string name, Address address, Coordinates coordinates, Email email, PhoneNumber? phoneNumber)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(name) || name.Length > MAX_NAME_LENGTH)
+                return NotarErrors.InvalidName();
+
+            var notar = new Notar(name, address, coordinates, email, phoneNumber);
+
+            return notar;
         }
     }
 }
