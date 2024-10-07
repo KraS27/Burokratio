@@ -61,13 +61,15 @@ namespace Infrastructure.Configurations
                 b.IsRequired();
 
                 b.Property(e => e.Value)
-                .HasColumnName("email");
+                .HasColumnName("email")
+                .HasMaxLength(Email.MAX_LENGTH);
             });
 
             builder.ComplexProperty(n => n.PhoneNumber, b =>
             {   
                 b.Property(p => p.Number)
-                .HasColumnName("phone_number");
+                .HasColumnName("phone_number")
+                .HasMaxLength(PhoneNumber.MAX_LENGTH);
             });
 
             builder.Property(n => n.CreatedAt)
