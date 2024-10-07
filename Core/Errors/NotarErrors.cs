@@ -12,5 +12,10 @@ namespace Core.Errors
         public static Error NotFound(Guid id) =>
             Error.NotFound($"Notar with id: {id} not found.");
 
+        public static Error EmailConflict(string email) =>
+            Error.Conflict($"Notar with email: {email} already exist.");
+
+        public static Error PhoneNumberConflict(string phone) =>
+            Error.Conflict($"Notar with phone number: {phone} already exist.");
     }
 }

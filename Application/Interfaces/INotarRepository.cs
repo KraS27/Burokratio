@@ -1,10 +1,15 @@
 ﻿using Core.Entities;
+using Core.ValueObjects;
 
 namespace Application.Interfaces
 {
     public interface INotarRepository
     {
         Task<Notar?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+
+        Task<Notar?> GetByEmailAsync(Email email, CancellationToken cancellationToken);
+
+        Task<Notar?> GetByPhoneAsync(PhoneNumber number, CancellationToken cancellationToken);
 
         Task<ICollection<Notar>> GetAllAsync(CancellationToken cancellationToken);
 

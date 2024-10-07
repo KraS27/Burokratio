@@ -4,6 +4,8 @@ using Core.Entities;
 using Core.Errors;
 using Core.Primitives;
 using Core.ValueObjects;
+using System.Numerics;
+using System.Threading;
 
 namespace Application.Services
 {
@@ -35,38 +37,61 @@ namespace Application.Services
 
         public async Task<Result<Guid>> AddAsync(CreateNotarRequest request, CancellationToken cancellationToken)
         {
-            //TODO: CHECK If email and phone number Unique
+            var emailTask = CheckEmail(request.email, cancellationToken);
+            var phoneTask = CheckPhone(request.phoneNumber, cancellationToken);
+            
+            await Task.WhenAll(emailTask, phoneTask);          
 
-            var address = Address.Create(request.division, request.country, request.city, request.street, request.postalCode);
+            var addressResult = Address.Create(request.division, request.country, request.city, request.street, request.postalCode);
 
-            if (address.IsFailure)
-                return address.Error!;
+            if (addressResult.IsFailure)
+                return addressResult.Error!;
 
-            var coordinates = Coordinates.Create(request.latitude, request.longitude);
+            var coordinatesResult = Coordinates.Create(request.latitude, request.longitude);
 
-            if(coordinates.IsFailure)
-                return coordinates.Error!;
-
-            var email = Email.Create(request.email);
-
-            if (email.IsFailure)
-                return email.Error!;
-
-            var phoneNumber = PhoneNumber.Create(request.phoneNumber);
-
-            if (phoneNumber.IsFailure)
-                return phoneNumber.Error!;
-
+            if(coordinatesResult.IsFailure)
+                return coordinatesResult.Error!;
+           
             var notar = Notar.Create(
                 request.name, 
-                address.Value!, 
-                coordinates.Value!, 
-                email.Value!, 
-                phoneNumber.Value).Value;
+                addressResult.Value!, 
+                coordinatesResult.Value!,
+                emailTask.Result.Value!,
+                phoneTask.Result.Value).Value;
 
             await _notarRepository.AddAsync(notar!, cancellationToken);
 
             return notar!.Id;
+        }     
+
+        private async Task<Result<Email>> CheckEmail(string email, CancellationToken cancellationToken)
+        {
+            var emailResult = Email.Create(email);
+
+            if (emailResult.IsFailure)
+                return emailResult.Error!;
+
+            var notar = await _notarRepository.GetByEmailAsync(emailResult.Value!, cancellationToken);
+
+            if (notar != null)
+                return NotarErrors.EmailConflict(notar.Email.Value);
+
+            return emailResult;
+        }
+
+        private async Task<Result<PhoneNumber>> CheckPhone(string phoneNumber, CancellationToken cancellationToken)
+        {
+            var phoneResult = PhoneNumber.Create(phoneNumber);
+
+            if (phoneResult.IsFailure)
+                return phoneResult.Error!;
+
+            var notar = await _notarRepository.GetByPhoneAsync(phoneResult.Value!, cancellationToken);
+
+            if (notar != null)
+                return NotarErrors.PhoneNumberConflict(notar.PhoneNumber!.Number);
+
+            return phoneResult;
         }
     }
 }

@@ -34,7 +34,11 @@ namespace Core.Entities
             PhoneNumber = phoneNumber;
         }
 
-        public static Result<Notar> Create(string name, Address address, Coordinates coordinates, Email email, PhoneNumber? phoneNumber)
+        public static Result<Notar> Create(string name, 
+            Address address, 
+            Coordinates coordinates, 
+            Email email, 
+            PhoneNumber? phoneNumber)
         {
             if (string.IsNullOrWhiteSpace(name) || name.Length > MAX_NAME_LENGTH)
                 return NotarErrors.InvalidName();
