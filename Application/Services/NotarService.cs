@@ -43,14 +43,10 @@ namespace Application.Services
             await Task.WhenAll(emailTask, phoneTask);          
 
             var addressResult = Address.Create(request.division, request.country, request.city, request.street, request.postalCode);
-
-            if (addressResult.IsFailure)
-                return addressResult.Error!;
-
             var coordinatesResult = Coordinates.Create(request.latitude, request.longitude);
 
-            if(coordinatesResult.IsFailure)
-                return coordinatesResult.Error!;
+            if(addressResult.IsFailure || coordinatesResult.IsFailure)
+                return addressResult.Error ?? coordinatesResult.Error!;
            
             var notar = Notar.Create(
                 request.name, 
