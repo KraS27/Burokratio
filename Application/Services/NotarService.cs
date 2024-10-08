@@ -4,8 +4,6 @@ using Core.Entities;
 using Core.Errors;
 using Core.Primitives;
 using Core.ValueObjects;
-using System.Numerics;
-using System.Threading;
 
 namespace Application.Services
 {
@@ -37,8 +35,8 @@ namespace Application.Services
 
         public async Task<Result<Guid>> AddAsync(CreateNotarRequest request, CancellationToken cancellationToken)
         {
-            var emailTask = CheckEmail(request.email, cancellationToken);
-            var phoneTask = CheckPhone(request.phoneNumber, cancellationToken);
+            var emailTask = CheckEmailAsync(request.email, cancellationToken);
+            var phoneTask = CheckPhoneAsync(request.phoneNumber, cancellationToken);
             
             await Task.WhenAll(emailTask, phoneTask);          
 
@@ -60,7 +58,7 @@ namespace Application.Services
             return notar!.Id;
         }     
 
-        private async Task<Result<Email>> CheckEmail(string email, CancellationToken cancellationToken)
+        private async Task<Result<Email>> CheckEmailAsync(string email, CancellationToken cancellationToken)
         {
             var emailResult = Email.Create(email);
 
@@ -75,7 +73,7 @@ namespace Application.Services
             return emailResult;
         }
 
-        private async Task<Result<PhoneNumber>> CheckPhone(string phoneNumber, CancellationToken cancellationToken)
+        private async Task<Result<PhoneNumber>> CheckPhoneAsync(string phoneNumber, CancellationToken cancellationToken)
         {
             var phoneResult = PhoneNumber.Create(phoneNumber);
 

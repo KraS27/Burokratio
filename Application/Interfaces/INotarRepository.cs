@@ -5,18 +5,18 @@ namespace Application.Interfaces
 {
     public interface INotarRepository
     {
-        Task<Notar?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+        Task<Notar?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
-        Task<Notar?> GetByEmailAsync(Email email, CancellationToken cancellationToken);
+        Task<Notar?> GetByEmailAsync(Email email, CancellationToken cancellationToken = default);
 
-        Task<Notar?> GetByPhoneAsync(PhoneNumber number, CancellationToken cancellationToken);
+        Task<Notar?> GetByPhoneAsync(PhoneNumber number, CancellationToken cancellationToken = default);
 
-        Task<ICollection<Notar>> GetAllAsync(CancellationToken cancellationToken);
+        Task<ICollection<Notar>> GetAllAsync(CancellationToken cancellationToken = default);
 
-        Task AddAsync(Notar notar, CancellationToken cancellationToken);
+        Task AddAsync(Notar notar, CancellationToken cancellationToken = default);
 
-        Task UpdateAsync(Notar notar, CancellationToken cancellationToken);
+        Task UpdateAsync(Notar notar, CancellationToken cancellationToken = default);
 
-        Task DeleteAsync(Guid id, CancellationToken cancellationToken);
+        Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
     }
 }
