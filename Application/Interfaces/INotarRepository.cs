@@ -15,6 +15,6 @@ namespace Application.Interfaces
 
         Task AddAsync(Notar notar, CancellationToken cancellationToken = default);
 
-        Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+        Task DeleteAsync(Notar notar, CancellationToken cancellationToken = default);
     }
 }

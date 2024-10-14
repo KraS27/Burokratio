@@ -20,10 +20,8 @@ namespace Infrastructure.Repositories
                 AddAsync(notar, cancellationToken);           
         }
 
-        public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+        public async Task DeleteAsync(Notar notar, CancellationToken cancellationToken = default)
         {
-            var notar = await GetByIdAsync(id);
-
             _dbContext.Set<Notar>().
                Remove(notar!);            
         }

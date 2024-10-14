@@ -72,7 +72,6 @@ namespace Application.Services
 
             return emailResult;
         }
-
         private async Task<Result<PhoneNumber>> CheckPhoneAsync(string phoneNumber, CancellationToken cancellationToken)
         {
             var phoneResult = PhoneNumber.Create(phoneNumber);
@@ -86,6 +85,17 @@ namespace Application.Services
                 return NotarErrors.PhoneNumberConflict(notar.PhoneNumber!.Number);
 
             return phoneResult;
+        }
+
+        public async Task<Result> DeleteAsync(Guid id, CancellationToken cancellationToken)
+        {
+            var notar = await _notarRepository.GetByIdAsync(id, cancellationToken);
+
+            if (notar == null)
+                return NotarErrors.NotFound(id);
+
+            await _notarRepository.DeleteAsync(notar!, cancellationToken);
+            return Result.Success();
         }
     }
 }
