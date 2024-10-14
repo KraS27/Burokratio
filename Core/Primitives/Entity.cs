@@ -1,11 +1,11 @@
 ﻿namespace Core.Primitives
 {
-    public class Entity
+    public abstract class Entity
     {
-        public Guid Id { get; }
+        public Guid Id { get; protected set; }
 
-        public DateTimeOffset CreatedAt { get; }
+        public DateTimeOffset CreatedAt { get; protected set; }
 
-        public DateTimeOffset UpdatedAt { get; }
+        public DateTimeOffset UpdatedAt { get; protected set; }
     }
 }

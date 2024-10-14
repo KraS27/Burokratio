@@ -10,10 +10,12 @@ namespace Application.Services
     public class NotarService
     {
         private readonly INotarRepository _notarRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public NotarService(INotarRepository notarRepository)
+        public NotarService(INotarRepository notarRepository, IUnitOfWork unitOfWork)
         {
             _notarRepository = notarRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<Result<Notar?>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
@@ -54,6 +56,7 @@ namespace Application.Services
                 phoneTask.Result.Value).Value;
 
             await _notarRepository.AddAsync(notar!, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return notar!.Id;
         }     
@@ -95,6 +98,34 @@ namespace Application.Services
                 return NotarErrors.NotFound(id);
 
             await _notarRepository.DeleteAsync(notar!, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            return Result.Success();
+        }
+
+        public async Task<Result> UdpateAsync(UpdateNotarRequest request, CancellationToken cancellationToken)
+        {
+            var notar = await _notarRepository.GetByIdAsync(request.id);
+
+            if (notar == null)
+                return NotarErrors.NotFound(request.id);
+
+            var emailTask = CheckEmailAsync(request.email, cancellationToken);
+            var phoneTask = CheckPhoneAsync(request.phoneNumber, cancellationToken);
+
+            await Task.WhenAll(emailTask, phoneTask);
+
+            var addressResult = Address.Create(request.division, request.country, request.city, request.street, request.postalCode);
+            var coordinatesResult = Coordinates.Create(request.latitude, request.longitude);
+
+            if (addressResult.IsFailure || coordinatesResult.IsFailure)
+                return addressResult.Error ?? coordinatesResult.Error!;
+
+            notar.Update(request.name,
+                addressResult.Value!,
+                coordinatesResult.Value!,
+                emailTask.Result.Value!,
+                phoneTask.Result.Value);
+
             return Result.Success();
         }
     }

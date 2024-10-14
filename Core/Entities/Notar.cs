@@ -8,23 +8,23 @@ namespace Core.Entities
     {
         public const int MAX_NAME_LENGTH = 256;
 
-        public string Name { get;  } = null!;
+        public string Name { get; private set; } = null!;
 
-        public Address Address { get;  } = null!;
-        
-        public Coordinates Coordinates { get; } = null!;
+        public Address Address { get; private set; } = null!;
 
-        public Email Email { get; } = null!;
+        public Coordinates Coordinates { get; private set; } = null!;
 
-        public PhoneNumber? PhoneNumber { get; }
+        public Email Email { get; private set; } = null!;
 
-        private Notar(Guid id, 
-            string name, 
-            Address address, 
+        public PhoneNumber? PhoneNumber { get; private set; }
+
+        private Notar(Guid id,
+            string name,
+            Address address,
             Coordinates coordinates,
             Email email,
-            PhoneNumber? phoneNumber, 
-            DateTimeOffset createdAt, 
+            PhoneNumber? phoneNumber,
+            DateTimeOffset createdAt,
             DateTimeOffset updatedAt)
         {
             Name = name;
@@ -34,10 +34,10 @@ namespace Core.Entities
             PhoneNumber = phoneNumber;
         }
 
-        public static Result<Notar> Create(string name, 
-            Address address, 
-            Coordinates coordinates, 
-            Email email, 
+        public static Result<Notar> Create(string name,
+            Address address,
+            Coordinates coordinates,
+            Email email,
             PhoneNumber? phoneNumber)
         {
             if (string.IsNullOrWhiteSpace(name) || name.Length > MAX_NAME_LENGTH)
@@ -45,15 +45,29 @@ namespace Core.Entities
 
             var notar = new Notar(
                 Guid.NewGuid(),
-                name, 
-                address, 
+                name,
+                address,
                 coordinates,
-                email, 
+                email,
                 phoneNumber,
                 DateTimeOffset.Now,
                 DateTimeOffset.Now);
 
             return notar;
+        }
+
+        public void Update(string name,
+            Address address,
+            Coordinates coordinates,
+            Email email,
+            PhoneNumber? phoneNumber)
+        {
+            Name = name;
+            Address = address;
+            Coordinates = coordinates;
+            Email = email;
+            PhoneNumber = phoneNumber;
+            UpdatedAt = DateTimeOffset.Now;
         }
     }
 }
