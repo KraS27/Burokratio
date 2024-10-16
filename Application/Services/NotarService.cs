@@ -126,6 +126,8 @@ namespace Application.Services
                 emailTask.Result.Value!,
                 phoneTask.Result.Value);
 
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
             return Result.Success();
         }
     }
