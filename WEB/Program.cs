@@ -1,3 +1,7 @@
+using Application.Services;
+using Infrastructure;
+using Microsoft.EntityFrameworkCore;
+
 namespace WEB
 {
     public class Program
@@ -5,10 +9,15 @@ namespace WEB
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            var connection = builder.Configuration.GetConnectionString("DefaultConnection");
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connection));
+
+            builder.Services.AddScoped<NotarService>();
 
             var app = builder.Build();
 
@@ -21,7 +30,6 @@ namespace WEB
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 
