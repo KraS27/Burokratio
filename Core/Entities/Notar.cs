@@ -34,7 +34,7 @@ namespace Core.Entities
             PhoneNumber = phoneNumber;
         }
 
-        public static Result<Notar> Create(string name,
+        public static Result<Notar?> Create(string name,
             Address address,
             Coordinates coordinates,
             Email email,

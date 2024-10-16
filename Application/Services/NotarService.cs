@@ -40,7 +40,10 @@ namespace Application.Services
             var emailTask = CheckEmailAsync(request.email, cancellationToken);
             var phoneTask = CheckPhoneAsync(request.phoneNumber, cancellationToken);
             
-            await Task.WhenAll(emailTask, phoneTask);          
+            await Task.WhenAll(emailTask, phoneTask);
+
+            if (emailTask.Result.IsFailure || phoneTask.Result.IsFailure)
+                return emailTask.Result.Error ?? phoneTask.Result.Error!;
 
             var addressResult = Address.Create(request.division, request.country, request.city, request.street, request.postalCode);
             var coordinatesResult = Coordinates.Create(request.latitude, request.longitude);
@@ -90,18 +93,6 @@ namespace Application.Services
             return phoneResult;
         }
 
-        public async Task<Result> DeleteAsync(Guid id, CancellationToken cancellationToken)
-        {
-            var notar = await _notarRepository.GetByIdAsync(id, cancellationToken);
-
-            if (notar == null)
-                return NotarErrors.NotFound(id);
-
-            await _notarRepository.DeleteAsync(notar!, cancellationToken);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-            return Result.Success();
-        }
-
         public async Task<Result> UdpateAsync(UpdateNotarRequest request, CancellationToken cancellationToken)
         {
             var notar = await _notarRepository.GetByIdAsync(request.id);
@@ -109,11 +100,19 @@ namespace Application.Services
             if (notar == null)
                 return NotarErrors.NotFound(request.id);
 
-            var emailTask = CheckEmailAsync(request.email, cancellationToken);
-            var phoneTask = CheckPhoneAsync(request.phoneNumber, cancellationToken);
-
+            var emailTask = notar.Email.Value != request.email
+                ? CheckEmailAsync(request.email, cancellationToken)
+                : Task.FromResult(Result<Email>.Success(notar.Email));
+          
+            var phoneTask = notar.PhoneNumber.Number != request.phoneNumber
+                ? CheckPhoneAsync(request.phoneNumber, cancellationToken)
+                : Task.FromResult(Result<PhoneNumber>.Success(notar.PhoneNumber));
+                    
             await Task.WhenAll(emailTask, phoneTask);
 
+            if (emailTask.Result.IsFailure || phoneTask.Result.IsFailure)
+                return emailTask.Result.Error ?? phoneTask.Result.Error!;
+            
             var addressResult = Address.Create(request.division, request.country, request.city, request.street, request.postalCode);
             var coordinatesResult = Coordinates.Create(request.latitude, request.longitude);
 
@@ -130,5 +129,17 @@ namespace Application.Services
 
             return Result.Success();
         }
+
+        public async Task<Result> DeleteAsync(Guid id, CancellationToken cancellationToken)
+        {
+            var notar = await _notarRepository.GetByIdAsync(id, cancellationToken);
+
+            if (notar == null)
+                return NotarErrors.NotFound(id);
+
+            await _notarRepository.DeleteAsync(notar!, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            return Result.Success();
+        }       
     }
 }

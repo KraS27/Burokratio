@@ -1,5 +1,7 @@
+using Application.Interfaces;
 using Application.Services;
 using Infrastructure;
+using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace WEB
@@ -18,6 +20,8 @@ namespace WEB
             builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connection));
 
             builder.Services.AddScoped<NotarService>();
+            builder.Services.AddScoped<INotarRepository, NotarRepository>();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             var app = builder.Build();
 

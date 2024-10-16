@@ -7,31 +7,30 @@ namespace WEB.Extensions
         public static IResult ToProblemDetails(this Result result)
         {
             if (result.IsSuccess)
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("Cannot convert a successful result to problem details.");
 
-            return Results.Problem(
-                statusCode: GetStatusCode(result.Error.ErrorType),
-                title: GetTitle(result.Error.ErrorType),
-                type: GetType(result.Error.ErrorType),
-                extensions: new Dictionary<string, object?>
-                {
-                    {"errors", new[] {result.Error} }
-                });          
+            return CreateProblemDetails(result.Error!);
         }
 
         public static IResult ToProblemDetails<T>(this Result<T> result)
         {
             if (result.IsSuccess)
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("Cannot convert a successful result to problem details.");
 
+            return CreateProblemDetails(result.Error!);
+        }
+
+        private static IResult CreateProblemDetails(Error error)
+        {
             return Results.Problem(
-                statusCode: GetStatusCode(result.Error.ErrorType),
-                title: GetTitle(result.Error.ErrorType),
-                type: GetType(result.Error.ErrorType),
+                statusCode: GetStatusCode(error.ErrorType),
+                title: GetTitle(error.ErrorType),
+                type: GetType(error.ErrorType),
                 extensions: new Dictionary<string, object?>
                 {
-                    {"errors", new[] {result.Error} }
-                });
+                    { nameof(error), new[] { error.Description } }
+                }
+            );
         }
 
         static int GetStatusCode(ErrorType errorType) =>
