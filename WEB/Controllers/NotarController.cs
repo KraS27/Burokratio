@@ -28,7 +28,7 @@ namespace WEB.Controllers
         [HttpGet("{id:guid}")]
         public async Task<IResult> Get(Guid id, CancellationToken cancellationToken)
         {
-            var result = await _notarService.GetAllAsync(cancellationToken);
+            var result = await _notarService.GetByIdAsync(id, cancellationToken);
 
             return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblemDetails();
         }
