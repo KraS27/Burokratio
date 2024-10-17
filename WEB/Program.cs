@@ -3,6 +3,7 @@ using Application.Services;
 using Infrastructure;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+using WEB.Middlware;
 
 namespace WEB
 {
@@ -36,6 +37,8 @@ namespace WEB
             app.UseAuthorization();
 
             app.MapControllers();
+
+            app.UseMiddleware<ExceptionHandlingMiddlware>();
 
             app.Run();
         }
