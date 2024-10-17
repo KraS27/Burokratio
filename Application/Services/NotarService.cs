@@ -42,8 +42,11 @@ namespace Application.Services
             
             await Task.WhenAll(emailTask, phoneTask);
 
-            if (emailTask.Result.IsFailure || phoneTask.Result.IsFailure)
-                return emailTask.Result.Error ?? phoneTask.Result.Error!;
+            var emailResult = await emailTask;
+            var phoneResult = await phoneTask;
+
+            if (emailResult.IsFailure || phoneResult.IsFailure)
+                return emailResult.Error ?? phoneResult.Error!;
 
             var addressResult = Address.Create(request.division, request.country, request.city, request.street, request.postalCode);
             var coordinatesResult = Coordinates.Create(request.latitude, request.longitude);
@@ -51,17 +54,20 @@ namespace Application.Services
             if(addressResult.IsFailure || coordinatesResult.IsFailure)
                 return addressResult.Error ?? coordinatesResult.Error!;
            
-            var notar = Notar.Create(
+            Result<Notar> notarResult = Notar.Create(
                 request.name, 
                 addressResult.Value!, 
                 coordinatesResult.Value!,
-                emailTask.Result.Value!,
-                phoneTask.Result.Value).Value;
+                emailResult.Value!,
+                phoneResult.Value).Value!;
 
-            await _notarRepository.AddAsync(notar!, cancellationToken);
+            if (notarResult.IsFailure)
+                return notarResult.Error!;
+
+            await _notarRepository.AddAsync(notarResult.Value!, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return notar!.Id;
+            return notarResult.Value!.Id;
         }     
 
         private async Task<Result<Email>> CheckEmailAsync(string email, CancellationToken cancellationToken)
@@ -107,23 +113,29 @@ namespace Application.Services
             var phoneTask = notar.PhoneNumber.Number != request.phoneNumber
                 ? CheckPhoneAsync(request.phoneNumber, cancellationToken)
                 : Task.FromResult(Result<PhoneNumber>.Success(notar.PhoneNumber));
-                    
+
             await Task.WhenAll(emailTask, phoneTask);
 
-            if (emailTask.Result.IsFailure || phoneTask.Result.IsFailure)
-                return emailTask.Result.Error ?? phoneTask.Result.Error!;
-            
+            var emailResult = await emailTask;
+            var phoneResult = await phoneTask;
+
+            if (emailResult.IsFailure || phoneResult.IsFailure)
+                return emailResult.Error ?? phoneResult.Error!;
+
             var addressResult = Address.Create(request.division, request.country, request.city, request.street, request.postalCode);
             var coordinatesResult = Coordinates.Create(request.latitude, request.longitude);
 
             if (addressResult.IsFailure || coordinatesResult.IsFailure)
                 return addressResult.Error ?? coordinatesResult.Error!;
 
-            notar.Update(request.name,
+            var updateResult = notar.Update(request.name,
                 addressResult.Value!,
                 coordinatesResult.Value!,
-                emailTask.Result.Value!,
-                phoneTask.Result.Value);
+                emailResult.Value!,
+                phoneResult.Value);
+
+            if (updateResult.IsFailure)
+                return updateResult.Error!;
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 

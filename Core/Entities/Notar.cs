@@ -34,7 +34,7 @@ namespace Core.Entities
             PhoneNumber = phoneNumber;
         }
 
-        public static Result<Notar?> Create(string name,
+        public static Result<Notar> Create(string name,
             Address address,
             Coordinates coordinates,
             Email email,
@@ -56,18 +56,23 @@ namespace Core.Entities
             return notar;
         }
 
-        public void Update(string name,
+        public Result Update(string name,
             Address address,
             Coordinates coordinates,
             Email email,
             PhoneNumber? phoneNumber)
         {
+            if (string.IsNullOrWhiteSpace(name) || name.Length > MAX_NAME_LENGTH)
+                return NotarErrors.InvalidName();
+
             Name = name;
             Address = address;
             Coordinates = coordinates;
             Email = email;
             PhoneNumber = phoneNumber;
             UpdatedAt = DateTimeOffset.Now;
+
+            return Result.Success();
         }
     }
 }
