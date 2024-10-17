@@ -66,7 +66,9 @@ namespace Infrastructure.Configurations
             });
 
             builder.ComplexProperty(n => n.PhoneNumber, b =>
-            {   
+            {
+                b.IsRequired();
+
                 b.Property(p => p.Number)
                 .HasColumnName("phone_number")
                 .HasMaxLength(PhoneNumber.MAX_LENGTH);
