@@ -18,6 +18,8 @@ namespace Core.Entities
 
         public PhoneNumber? PhoneNumber { get; private set; }
 
+        private Notar() { }
+
         private Notar(Guid id,
             string name,
             Address address,
