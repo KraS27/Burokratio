@@ -37,14 +37,9 @@ namespace Application.Services
 
         public async Task<Result<Guid>> AddAsync(CreateNotarRequest request, CancellationToken cancellationToken)
         {
-            var emailTask = CheckEmailAsync(request.email, cancellationToken);
-            var phoneTask = CheckPhoneAsync(request.phoneNumber, cancellationToken);
+            var emailResult = await CheckEmailAsync(request.email, cancellationToken);
+            var phoneResult = await CheckPhoneAsync(request.phoneNumber, cancellationToken);
             
-            await Task.WhenAll(emailTask, phoneTask);
-
-            var emailResult = await emailTask;
-            var phoneResult = await phoneTask;
-
             if (emailResult.IsFailure || phoneResult.IsFailure)
                 return emailResult.Error ?? phoneResult.Error!;
 
@@ -98,10 +93,9 @@ namespace Application.Services
 
             return phoneResult;
         }
-
         public async Task<Result> UdpateAsync(UpdateNotarRequest request, CancellationToken cancellationToken)
         {
-            var notar = await _notarRepository.GetByIdAsync(request.id);
+            var notar = await _notarRepository.GetByIdAsync(request.id, cancellationToken);
 
             if (notar == null)
                 return NotarErrors.NotFound(request.id);
@@ -141,7 +135,6 @@ namespace Application.Services
 
             return Result.Success();
         }
-
         public async Task<Result> DeleteAsync(Guid id, CancellationToken cancellationToken)
         {
             var notar = await _notarRepository.GetByIdAsync(id, cancellationToken);
