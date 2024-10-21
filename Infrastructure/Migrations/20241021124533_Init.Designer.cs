@@ -4,16 +4,16 @@ using System.Collections.Generic;
 using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241017123507_Init")]
+    [Migration("20241021124533_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -22,29 +22,29 @@ namespace Infrastructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "9.0.0-rc.2.24474.1")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Core.Entities.Notar", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("uuid")
                         .HasColumnName("id");
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)")
+                        .HasColumnType("character varying(256)")
                         .HasColumnName("name");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
-                        .HasColumnType("datetimeoffset")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
                     b.ComplexProperty<Dictionary<string, object>>("Address", "Core.Entities.Notar.Address#Address", b1 =>
@@ -54,31 +54,31 @@ namespace Infrastructure.Migrations
                             b1.Property<string>("City")
                                 .IsRequired()
                                 .HasMaxLength(256)
-                                .HasColumnType("nvarchar(256)")
+                                .HasColumnType("character varying(256)")
                                 .HasColumnName("city");
 
                             b1.Property<string>("Country")
                                 .IsRequired()
                                 .HasMaxLength(128)
-                                .HasColumnType("nvarchar(128)")
+                                .HasColumnType("character varying(128)")
                                 .HasColumnName("country");
 
                             b1.Property<string>("Division")
                                 .IsRequired()
                                 .HasMaxLength(128)
-                                .HasColumnType("nvarchar(128)")
+                                .HasColumnType("character varying(128)")
                                 .HasColumnName("division");
 
                             b1.Property<string>("PostalCode")
                                 .IsRequired()
                                 .HasMaxLength(16)
-                                .HasColumnType("nvarchar(16)")
+                                .HasColumnType("character varying(16)")
                                 .HasColumnName("postal_code");
 
                             b1.Property<string>("Street")
                                 .IsRequired()
                                 .HasMaxLength(256)
-                                .HasColumnType("nvarchar(256)")
+                                .HasColumnType("character varying(256)")
                                 .HasColumnName("street");
                         });
 
@@ -87,11 +87,11 @@ namespace Infrastructure.Migrations
                             b1.IsRequired();
 
                             b1.Property<double>("Latitude")
-                                .HasColumnType("float")
+                                .HasColumnType("double precision")
                                 .HasColumnName("latitude");
 
                             b1.Property<double>("Longitude")
-                                .HasColumnType("float")
+                                .HasColumnType("double precision")
                                 .HasColumnName("longitude");
                         });
 
@@ -102,7 +102,7 @@ namespace Infrastructure.Migrations
                             b1.Property<string>("Value")
                                 .IsRequired()
                                 .HasMaxLength(256)
-                                .HasColumnType("nvarchar(256)")
+                                .HasColumnType("character varying(256)")
                                 .HasColumnName("email");
                         });
 
@@ -113,7 +113,7 @@ namespace Infrastructure.Migrations
                             b1.Property<string>("Number")
                                 .IsRequired()
                                 .HasMaxLength(32)
-                                .HasColumnType("nvarchar(32)")
+                                .HasColumnType("character varying(32)")
                                 .HasColumnName("phone_number");
                         });
 

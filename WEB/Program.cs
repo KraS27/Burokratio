@@ -12,13 +12,13 @@ namespace WEB
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            var connection = builder.Configuration.GetConnectionString("MsSql");
+            var connection = builder.Configuration.GetConnectionString("Psql");
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connection));
+            builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connection));
 
             builder.Services.AddScoped<NotarService>();
             builder.Services.AddScoped<INotarRepository, NotarRepository>();
