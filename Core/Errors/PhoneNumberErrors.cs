@@ -5,10 +5,7 @@ namespace Core.Errors
 {
     public class PhoneNumberErrors
     {
-        public static Error InvalidNumberLength() =>
-            Error.Validation($"Phone number is required and must be less than {PhoneNumber.MAX_LENGTH}.");
-
-        public static Error InvalidNumberValue() =>
+        public static Error InvalidValue() =>
             Error.Validation($"Phone number is invalid.");
     }
 }

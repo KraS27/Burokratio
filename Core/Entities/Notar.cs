@@ -16,7 +16,7 @@ namespace Core.Entities
 
         public Email Email { get; private set; } = null!;
 
-        public PhoneNumber PhoneNumber { get; private set; }
+        public PhoneNumber? PhoneNumber { get; private set; }
 
         private Notar() { }
 

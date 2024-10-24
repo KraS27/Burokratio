@@ -23,11 +23,8 @@ namespace Core.ValueObjects
 
         public static Result<PhoneNumber> Create(string input)
         {
-            if (string.IsNullOrWhiteSpace(input) || input.Length > MAX_LENGTH)
-                return PhoneNumberErrors.InvalidNumberLength();
-
             if(Regex.IsMatch(input, phoneRegex) == false)
-                return PhoneNumberErrors.InvalidNumberValue();
+                return PhoneNumberErrors.InvalidValue();
 
             var number = new PhoneNumber(input);
 

@@ -37,24 +37,36 @@ namespace Application.Services
 
         public async Task<Result<Guid>> AddAsync(CreateNotarRequest request, CancellationToken cancellationToken)
         {
+            // Validate email
             var emailResult = await CheckEmailAsync(request.email, cancellationToken);
-            var phoneResult = await CheckPhoneAsync(request.phoneNumber, cancellationToken);
             
-            if (emailResult.IsFailure || phoneResult.IsFailure)
-                return emailResult.Error ?? phoneResult.Error!;
+            if (emailResult.IsFailure)
+                return emailResult.Error!;
 
+            // Validate phone number if provided
+            Result<PhoneNumber?> phoneResult = Result<PhoneNumber?>.Success(null);
+            if (!string.IsNullOrWhiteSpace(request.phoneNumber))
+            { 
+                phoneResult = await CheckPhoneAsync(request.phoneNumber, cancellationToken);
+                if (phoneResult.IsFailure)
+                    return phoneResult.Error!;
+            }
+            
+            // Validate address and coordinates
             var addressResult = Address.Create(request.division, request.country, request.city, request.street, request.postalCode);
             var coordinatesResult = Coordinates.Create(request.latitude, request.longitude);
 
             if(addressResult.IsFailure || coordinatesResult.IsFailure)
                 return addressResult.Error ?? coordinatesResult.Error!;
-           
+            
+            // Create Notar entity
             Result<Notar> notarResult = Notar.Create(
                 request.name, 
                 addressResult.Value!, 
                 coordinatesResult.Value!,
                 emailResult.Value!,
-                phoneResult.Value).Value!;
+                phoneResult?.Value! // Optional value for phone number
+                ).Value!;
 
             if (notarResult.IsFailure)
                 return notarResult.Error!;
