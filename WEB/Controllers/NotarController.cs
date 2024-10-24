@@ -40,5 +40,13 @@ namespace WEB.Controllers
 
             return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblemDetails();
         }        
+        
+        [HttpPut]
+        public async Task<IResult> Update([FromBody] UpdateNotarRequest request, CancellationToken cancellationToken)
+        {
+            Result result = await _notarService.UdpateAsync(request, cancellationToken);          
+
+            return result.IsSuccess ? Results.Ok() : result.ToProblemDetails();
+        }   
     }
 }

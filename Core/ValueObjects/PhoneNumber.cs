@@ -9,16 +9,16 @@ namespace Core.ValueObjects
         private const string phoneRegex = @"^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$";
         public const int MAX_LENGTH = 32;
 
-        public string Number { get; }
+        public string Value { get; }
 
-        private PhoneNumber(string number)
+        private PhoneNumber(string value)
         {
-            Number = number;
+            Value = value;
         }
 
         public override IEnumerable<object> GetAtomicValues()
         {
-            yield return Number;
+            yield return Value;
         }
 
         public static Result<PhoneNumber> Create(string input)

@@ -26,8 +26,8 @@ namespace Core.Entities
             Coordinates coordinates,
             Email email,
             PhoneNumber? phoneNumber,
-            DateTimeOffset createdAt,
-            DateTimeOffset updatedAt)
+            DateTime createdAt,
+            DateTime updatedAt)
         {
             Name = name;
             Address = address;
@@ -52,12 +52,12 @@ namespace Core.Entities
                 coordinates,
                 email,
                 phoneNumber,
-                DateTimeOffset.Now,
-                DateTimeOffset.Now);
+                DateTime.Now,
+                DateTime.Now);
 
             return notar;
         }
-
+        
         public Result Update(string name,
             Address address,
             Coordinates coordinates,
@@ -72,7 +72,7 @@ namespace Core.Entities
             Coordinates = coordinates;
             Email = email;
             PhoneNumber = phoneNumber;
-            UpdatedAt = DateTimeOffset.Now;
+            UpdatedAt = DateTime.Now;
 
             return Result.Success();
         }

@@ -6,7 +6,7 @@
         string division, string country, string city, string street, string postalCode,
         double latitude, double longitude,
         string email,
-        string phoneNumber)
+        string? phoneNumber)
     {
 
     }

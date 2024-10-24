@@ -26,8 +26,8 @@ namespace Infrastructure.Migrations
                     longitude = table.Column<double>(type: "double precision", nullable: false),
                     email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     phone_number = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    created_at = table.Column<DateTimeOffset>(type: "timestamp", nullable: false),
+                    updated_at = table.Column<DateTimeOffset>(type: "timestamp", nullable: false)
                 },
                 constraints: table =>
                 {
