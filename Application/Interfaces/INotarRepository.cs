@@ -1,4 +1,5 @@
-﻿using Core.Entities;
+﻿using System.Linq.Expressions;
+using Core.Entities;
 using Core.ValueObjects;
 
 namespace Application.Interfaces
@@ -6,6 +7,8 @@ namespace Application.Interfaces
     public interface INotarRepository
     {
         Task<Notar?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+        
+        Task<Notar?> GetByEmailOrPhoneAsync(Email email, PhoneNumber phoneNumber, CancellationToken cancellationToken = default);
 
         Task<Notar?> GetByEmailAsync(Email email, CancellationToken cancellationToken = default);
 

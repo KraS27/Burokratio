@@ -16,7 +16,7 @@ namespace Core.Entities
 
         public Email Email { get; private set; } = null!;
 
-        public PhoneNumber? PhoneNumber { get; private set; }
+        public PhoneNumber PhoneNumber { get; private set; }
 
         private Notar() { }
 
@@ -25,7 +25,7 @@ namespace Core.Entities
             Address address,
             Coordinates coordinates,
             Email email,
-            PhoneNumber? phoneNumber,
+            PhoneNumber phoneNumber,
             DateTime createdAt,
             DateTime updatedAt)
         {
@@ -40,7 +40,7 @@ namespace Core.Entities
             Address address,
             Coordinates coordinates,
             Email email,
-            PhoneNumber? phoneNumber)
+            PhoneNumber phoneNumber)
         {
             if (string.IsNullOrWhiteSpace(name) || name.Length > MAX_NAME_LENGTH)
                 return NotarErrors.InvalidName();
@@ -62,7 +62,7 @@ namespace Core.Entities
             Address address,
             Coordinates coordinates,
             Email email,
-            PhoneNumber? phoneNumber)
+            PhoneNumber phoneNumber)
         {
             if (string.IsNullOrWhiteSpace(name) || name.Length > MAX_NAME_LENGTH)
                 return NotarErrors.InvalidName();

@@ -37,19 +37,13 @@ namespace Application.Services
 
         public async Task<Result<Guid>> AddAsync(CreateNotarRequest request, CancellationToken cancellationToken)
         {
-            var emailResult = await CheckEmailAsync(request.email, cancellationToken);
-            
-            if (emailResult.IsFailure)
-                return emailResult.Error!;
-            
-            var phoneResult = Result<PhoneNumber?>.Success(null);
-            if (!string.IsNullOrWhiteSpace(request.phoneNumber))
-            { 
-                phoneResult = await CheckPhoneAsync(request.phoneNumber, cancellationToken);
-                if (phoneResult.IsFailure)
-                    return phoneResult.Error!;
-            }
-            
+           var emailAndPhoneResult =  await CheckEmailAndPhoneAsync(request.email, request.phoneNumber,cancellationToken);
+
+           if (emailAndPhoneResult.IsFailure)
+               return emailAndPhoneResult.Error!;
+           
+           (Email email, PhoneNumber phone) = emailAndPhoneResult.Value!;
+           
             var addressResult = Address.Create(request.division, request.country, request.city, request.street, request.postalCode);
             var coordinatesResult = Coordinates.Create(request.latitude, request.longitude);
 
@@ -60,8 +54,8 @@ namespace Application.Services
                 request.name, 
                 addressResult.Value!, 
                 coordinatesResult.Value!,
-                emailResult.Value!,
-                phoneResult?.Value!
+                email,
+                phone
                 ).Value!;
 
             if (notarResult.IsFailure)
@@ -72,7 +66,25 @@ namespace Application.Services
 
             return notarResult.Value!.Id;
         }     
-
+        
+        private async Task<Result<(Email email, PhoneNumber? phoneNumber)>> CheckEmailAndPhoneAsync(string email, string phone, CancellationToken cancellationToken)
+        {
+            var emailResult = Email.Create(email);
+            var phoneResult = PhoneNumber.Create(phone);
+            
+            if (emailResult.IsFailure || phoneResult.IsFailure)
+                return emailResult.Error ?? phoneResult.Error!;
+            
+            var notar = await _notarRepository.GetByEmailOrPhoneAsync(emailResult.Value!, phoneResult.Value, cancellationToken);
+            
+            if (notar != null && notar.Email.Equals(emailResult.Value!))
+              return NotarErrors.EmailConflict(notar.Email.Value);
+            
+            if(notar != null && notar.PhoneNumber!.Equals(phoneResult.Value!))
+                return NotarErrors.PhoneNumberConflict(notar.PhoneNumber!.Value);
+            
+            return Result<(Email email, PhoneNumber? phoneNumber)>.Success((emailResult.Value!, phoneResult.Value!));
+        }
         private async Task<Result<Email>> CheckEmailAsync(string email, CancellationToken cancellationToken)
         {
             var emailResult = Email.Create(email);
@@ -87,7 +99,7 @@ namespace Application.Services
 
             return emailResult;
         }
-        private async Task<Result<PhoneNumber?>> CheckPhoneAsync(string phoneNumber, CancellationToken cancellationToken)
+        private async Task<Result<PhoneNumber>> CheckPhoneAsync(string phoneNumber, CancellationToken cancellationToken)
         {
             var phoneResult = PhoneNumber.Create(phoneNumber);
 
@@ -114,7 +126,6 @@ namespace Application.Services
             else
             {
                 var emailResult = await CheckEmailAsync(request.email, cancellationToken);
-
                 if (emailResult.IsFailure)
                     return emailResult.Error!;
                 
@@ -124,15 +135,13 @@ namespace Application.Services
             PhoneNumber phoneNumber = null;
             if(notar.PhoneNumber != null && notar.PhoneNumber.Value == request.phoneNumber)
                 phoneNumber = notar.PhoneNumber;
-            else if (string.IsNullOrWhiteSpace(request.phoneNumber))
+            
+            if (!string.IsNullOrWhiteSpace(request.phoneNumber))
             {
-                var phoneResult = Result<PhoneNumber?>.Success(null);
-                if (!string.IsNullOrWhiteSpace(request.phoneNumber))
-                { 
-                    phoneResult = await CheckPhoneAsync(request.phoneNumber, cancellationToken);
-                    if (phoneResult.IsFailure)
-                        return phoneResult.Error!;
-                }
+                var phoneResult = await CheckPhoneAsync(request.phoneNumber, cancellationToken);
+                if (phoneResult.IsFailure)
+                    return phoneResult.Error!;
+                
                 phoneNumber = phoneResult.Value!;
             }
             
@@ -162,7 +171,7 @@ namespace Application.Services
             if (notar == null)
                 return NotarErrors.NotFound(id);
 
-            await _notarRepository.DeleteAsync(notar!, cancellationToken);
+            await _notarRepository.DeleteAsync(notar, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return Result.Success();
         }       

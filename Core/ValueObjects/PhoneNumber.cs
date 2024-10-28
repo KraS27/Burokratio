@@ -6,7 +6,7 @@ namespace Core.ValueObjects
 {
     public class PhoneNumber : ValueObject
     {
-        private const string phoneRegex = @"^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$";
+        private const string PHONE_REGEX = @"^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$";
         public const int MAX_LENGTH = 32;
 
         public string Value { get; }
@@ -23,7 +23,7 @@ namespace Core.ValueObjects
 
         public static Result<PhoneNumber> Create(string input)
         {
-            if(Regex.IsMatch(input, phoneRegex) == false)
+            if(Regex.IsMatch(input, PHONE_REGEX) == false)
                 return PhoneNumberErrors.InvalidValue();
 
             var number = new PhoneNumber(input);

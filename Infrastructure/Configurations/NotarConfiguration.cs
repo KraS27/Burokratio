@@ -70,8 +70,8 @@ namespace Infrastructure.Configurations
                 b.IsRequired();
 
                 b.Property(p => p.Value)
-                .HasColumnName("phone_number")
-                .HasMaxLength(PhoneNumber.MAX_LENGTH);
+                    .HasColumnName("phone_number")
+                    .HasMaxLength(PhoneNumber.MAX_LENGTH);
             });
 
             builder.Property(n => n.CreatedAt)

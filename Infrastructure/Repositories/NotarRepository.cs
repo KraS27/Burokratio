@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using System.Linq.Expressions;
+using Application.Interfaces;
 using Core.Entities;
 using Core.ValueObjects;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +32,12 @@ namespace Infrastructure.Repositories
             return await _dbContext.Set<Notar>()
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
+        }
+
+        public async Task<Notar?> GetByEmailOrPhoneAsync(Email email, PhoneNumber phoneNumber, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Set<Notar>()
+                .FirstOrDefaultAsync(n => n.Email.Equals(email) || n.PhoneNumber.Equals(phoneNumber), cancellationToken);
         }
 
         public async Task<Notar?> GetByEmailAsync(Email email, CancellationToken cancellationToken = default)
