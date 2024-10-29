@@ -48,5 +48,13 @@ namespace WEB.Controllers
 
             return result.IsSuccess ? Results.Ok() : result.ToProblemDetails();
         }   
+        
+        [HttpDelete("{id:guid}")]
+        public async Task<IResult> Delete(Guid id, CancellationToken cancellationToken)
+        {
+            Result result = await _notarService.DeleteAsync(id, cancellationToken);          
+
+            return result.IsSuccess ? Results.Ok() : result.ToProblemDetails();
+        }   
     }
 }

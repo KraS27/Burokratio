@@ -17,7 +17,6 @@ namespace Application.Services
             _notarRepository = notarRepository;
             _unitOfWork = unitOfWork;
         }
-
         public async Task<Result<Notar?>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             var notar = await _notarRepository.GetByIdAsync(id, cancellationToken);
@@ -27,14 +26,12 @@ namespace Application.Services
 
             return notar;
         }
-
         public async Task<Result<ICollection<Notar>>> GetAllAsync(CancellationToken cancellationToken)
         {
             var notars = await _notarRepository.GetAllAsync(cancellationToken);
           
             return Result<ICollection<Notar>>.Success(notars);
         }
-
         public async Task<Result<Guid>> AddAsync(CreateNotarRequest request, CancellationToken cancellationToken)
         {
            var emailAndPhoneResult =  await CheckEmailAndPhoneAsync(request.email, request.phoneNumber,cancellationToken);
@@ -66,7 +63,70 @@ namespace Application.Services
 
             return notarResult.Value!.Id;
         }     
-        
+        public async Task<Result> UdpateAsync(UpdateNotarRequest request, CancellationToken cancellationToken)
+        {
+            var notar = await _notarRepository.GetByIdAsync(request.id, cancellationToken);
+
+            if (notar == null)
+                return NotarErrors.NotFound(request.id);
+
+            Email email;
+            if (notar.Email.Value != request.email)
+            {
+                var emailResult = await CheckEmailAsync(request.email, cancellationToken);
+
+                if (emailResult.IsFailure)
+                    return emailResult.Error!;
+
+                email = emailResult.Value!;
+            }
+            else
+                email = notar.Email;
+            
+            PhoneNumber phoneNumber;
+            if (notar.PhoneNumber.Value != request.phoneNumber)
+            {
+                var phoneResult = await CheckPhoneAsync(request.phoneNumber, cancellationToken);
+
+                if (phoneResult.IsFailure)
+                    return phoneResult.Error!;
+
+                phoneNumber = phoneResult.Value!;
+            }
+            else
+                phoneNumber = notar.PhoneNumber;
+            
+            
+            var addressResult = Address.Create(request.division, request.country, request.city, request.street, request.postalCode);
+            var coordinatesResult = Coordinates.Create(request.latitude, request.longitude);
+
+            if (addressResult.IsFailure || coordinatesResult.IsFailure)
+                return addressResult.Error ?? coordinatesResult.Error!;
+
+            var updateResult = notar.Update(request.name,
+                addressResult.Value!,
+                coordinatesResult.Value!,
+                email,
+                phoneNumber);
+
+            if (updateResult.IsFailure)
+                return updateResult.Error!;
+
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            return Result.Success();
+        }
+        public async Task<Result> DeleteAsync(Guid id, CancellationToken cancellationToken)
+        {
+            var notar = await _notarRepository.GetByIdAsync(id, cancellationToken);
+
+            if (notar == null)
+                return NotarErrors.NotFound(id);
+
+            await _notarRepository.DeleteAsync(notar, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            return Result.Success();
+        }       
         private async Task<Result<(Email email, PhoneNumber? phoneNumber)>> CheckEmailAndPhoneAsync(string email, string phone, CancellationToken cancellationToken)
         {
             var emailResult = Email.Create(email);
@@ -113,67 +173,5 @@ namespace Application.Services
 
             return phoneResult;
         }
-        public async Task<Result> UdpateAsync(UpdateNotarRequest request, CancellationToken cancellationToken)
-        {
-            var notar = await _notarRepository.GetByIdAsync(request.id, cancellationToken);
-
-            if (notar == null)
-                return NotarErrors.NotFound(request.id);
-            
-            Email email;
-            if (notar.Email.Value == request.email)
-                email = notar.Email;
-            else
-            {
-                var emailResult = await CheckEmailAsync(request.email, cancellationToken);
-                if (emailResult.IsFailure)
-                    return emailResult.Error!;
-                
-                email = emailResult.Value!;
-            }
-            
-            PhoneNumber phoneNumber = null;
-            if(notar.PhoneNumber != null && notar.PhoneNumber.Value == request.phoneNumber)
-                phoneNumber = notar.PhoneNumber;
-            
-            if (!string.IsNullOrWhiteSpace(request.phoneNumber))
-            {
-                var phoneResult = await CheckPhoneAsync(request.phoneNumber, cancellationToken);
-                if (phoneResult.IsFailure)
-                    return phoneResult.Error!;
-                
-                phoneNumber = phoneResult.Value!;
-            }
-            
-            var addressResult = Address.Create(request.division, request.country, request.city, request.street, request.postalCode);
-            var coordinatesResult = Coordinates.Create(request.latitude, request.longitude);
-
-            if (addressResult.IsFailure || coordinatesResult.IsFailure)
-                return addressResult.Error ?? coordinatesResult.Error!;
-
-            var updateResult = notar.Update(request.name,
-                addressResult.Value!,
-                coordinatesResult.Value!,
-                email,
-                phoneNumber);
-
-            if (updateResult.IsFailure)
-                return updateResult.Error!;
-
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-            return Result.Success();
-        }
-        public async Task<Result> DeleteAsync(Guid id, CancellationToken cancellationToken)
-        {
-            var notar = await _notarRepository.GetByIdAsync(id, cancellationToken);
-
-            if (notar == null)
-                return NotarErrors.NotFound(id);
-
-            await _notarRepository.DeleteAsync(notar, cancellationToken);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-            return Result.Success();
-        }       
     }
 }
