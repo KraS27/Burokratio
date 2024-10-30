@@ -37,8 +37,9 @@ public class NotarServiceTests
     }
 
     [Fact]
-    public async Task AddAsync_ShouldReturnEmailConflictError()
+    public async Task AddAsync_ShouldReturnEmailConflictError_WhenEmailAreSame()
     {
+        // Arrange
         var existingNotar = Notar.Create(
             "Existing Notar",
             Address.Create("Division", "Country", "City", "Street", "12345").Value!,
@@ -55,14 +56,14 @@ public class NotarServiceTests
         var result = await _notarService.AddAsync(createRequest, CancellationToken.None);
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be(NotarErrors.EmailConflict(createRequest.email));
     }
 
     [Fact]
-    public async Task AddAsync_ShouldReturnPhoneNumberConflictError()
+    public async Task AddAsync_ShouldReturnPhoneNumberConflictError_WhenPhoneNumberAreSame()
     {
+        // Arrange
         var existingNotar = Notar.Create(
             "Existing Notar",
             Address.Create("Division", "Country", "City", "Street", "12345").Value!,
@@ -79,8 +80,35 @@ public class NotarServiceTests
         var result = await _notarService.AddAsync(createRequest, CancellationToken.None);
         
         //Assert
-        result.IsSuccess.Should().BeFalse();
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be(NotarErrors.PhoneNumberConflict(createRequest.phoneNumber));
+    }
+
+    [Fact]
+    public async Task AddAsync_ShouldReturnSuccessResult_WhenValuesCorrect()
+    {
+        // Arrange
+        var expectedNotar = Notar.Create(
+            "Existing Notar",
+            Address.Create("Division", "Country", "City", "Street", "12345").Value!,
+            Coordinates.Create(45.0, -93.0).Value!,
+            Email.Create(createRequest.email).Value!,
+            PhoneNumber.Create(createRequest.phoneNumber).Value!
+        ).Value!;
+        
+        _notarRepositoryMock
+            .Setup(repo => repo.GetByEmailOrPhoneAsync(It.IsAny<Email>(), It.IsAny<PhoneNumber>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Notar)null);
+        
+        _notarRepositoryMock
+            .Setup(repo => repo.AddAsync(It.IsAny<Notar>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+        
+        //Act
+        var result = await _notarService.AddAsync(createRequest, CancellationToken.None);
+        
+        //Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().Be(expectedNotar.Id);
     }
 }

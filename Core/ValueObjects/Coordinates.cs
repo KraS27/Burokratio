@@ -9,10 +9,10 @@ namespace Core.ValueObjects
 
         public double Longitude { get; }
 
-        public const int MIN_LATITUDE_VAUE = -90;
-        public const int MAX_LATITUDE_VAUE = 90;
-        public const int MIN_LONGITUDE_VAUE = -180;
-        public const int MAX_LONGITUDE_VAUE = 180;
+        public const int MIN_LATITUDE_VALUE = -90;
+        public const int MAX_LATITUDE_VALUE = 90;
+        public const int MIN_LONGITUDE_VALUE = -180;
+        public const int MAX_LONGITUDE_VALUE = 180;
 
         private Coordinates(double latitude, double longitude)
         {
@@ -28,10 +28,10 @@ namespace Core.ValueObjects
 
         public static Result<Coordinates> Create(double latitude, double longitude)
         {
-            if (latitude < MIN_LATITUDE_VAUE || latitude > MAX_LATITUDE_VAUE)
+            if (latitude < MIN_LATITUDE_VALUE || latitude > MAX_LATITUDE_VALUE)
                 return CoordinatesErrors.InvalidLatitude();
 
-            if (longitude < MIN_LONGITUDE_VAUE || longitude > MAX_LONGITUDE_VAUE)
+            if (longitude < MIN_LONGITUDE_VALUE || longitude > MAX_LONGITUDE_VALUE)
                 return CoordinatesErrors.InvalidLongitude();
 
             var coord = new Coordinates(latitude, longitude);
