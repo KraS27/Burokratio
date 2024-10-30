@@ -18,9 +18,9 @@ namespace WEB.Controllers
         }
 
         [HttpGet]
-        public async Task<IResult> GetAll(CancellationToken cancellationToken)
+        public async Task<IResult> GetAll(Pagination pagination, CancellationToken cancellationToken)
         {
-            var result = await _notarService.GetAllAsync(cancellationToken);
+            var result = await _notarService.GetAllAsync(pagination, cancellationToken);
 
             return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblemDetails();
         }

@@ -26,11 +26,11 @@ namespace Application.Services
 
             return notar;
         }
-        public async Task<Result<ICollection<Notar>>> GetAllAsync(CancellationToken cancellationToken)
+        public async Task<Result<PagedResponse<Notar>>> GetAllAsync(Pagination pagination, CancellationToken cancellationToken)
         {
-            var notars = await _notarRepository.GetAllAsync(cancellationToken);
+            var notars = await _notarRepository.GetAllAsync(pagination, cancellationToken);
           
-            return Result<ICollection<Notar>>.Success(notars);
+            return Result<PagedResponse<Notar>>.Success(notars);
         }
         public async Task<Result<Guid>> AddAsync(CreateNotarRequest request, CancellationToken cancellationToken)
         {

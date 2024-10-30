@@ -1,7 +1,9 @@
 ﻿using System.Linq.Expressions;
 using Application.Interfaces;
 using Core.Entities;
+using Core.Primitives;
 using Core.ValueObjects;
+using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
@@ -27,11 +29,11 @@ namespace Infrastructure.Repositories
                Remove(notar!);            
         }
 
-        public async Task<ICollection<Notar>> GetAllAsync(CancellationToken cancellationToken = default)
+        public async Task<PagedResponse<Notar>> GetAllAsync(Pagination pagination, CancellationToken cancellationToken = default)
         {
             return await _dbContext.Set<Notar>()
                 .AsNoTracking()
-                .ToListAsync(cancellationToken);
+                .ToPagedResponseAsync(pagination);
         }
 
         public async Task<Notar?> GetByEmailOrPhoneAsync(Email email, PhoneNumber phoneNumber, CancellationToken cancellationToken = default)
