@@ -135,13 +135,13 @@ namespace Application.Services
             if (emailResult.IsFailure || phoneResult.IsFailure)
                 return emailResult.Error ?? phoneResult.Error!;
             
-            var notar = await _notarRepository.GetByEmailOrPhoneAsync(emailResult.Value!, phoneResult.Value, cancellationToken);
+            var notar = await _notarRepository.GetByEmailOrPhoneAsync(emailResult.Value!, phoneResult.Value!, cancellationToken);
             
-            if (notar != null && notar.Email.Equals(emailResult.Value!))
+            if (notar != null && notar.Email.Equals(emailResult.Value))
               return NotarErrors.EmailConflict(notar.Email.Value);
             
-            if(notar != null && notar.PhoneNumber!.Equals(phoneResult.Value!))
-                return NotarErrors.PhoneNumberConflict(notar.PhoneNumber!.Value);
+            if(notar != null && notar.PhoneNumber.Equals(phoneResult.Value))
+                return NotarErrors.PhoneNumberConflict(notar.PhoneNumber.Value);
             
             return Result<(Email email, PhoneNumber? phoneNumber)>.Success((emailResult.Value!, phoneResult.Value!));
         }
