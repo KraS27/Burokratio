@@ -15,7 +15,7 @@ namespace Application.Interfaces
 
         Task<Notar?> GetByPhoneAsync(PhoneNumber number, CancellationToken cancellationToken = default);
 
-        Task<PagedResponse<Notar>> GetAllAsync(Pagination pagination, CancellationToken cancellationToken = default);
+        Task<Result<PagedResponse<Notar>>> GetAllAsync(Pagination pagination, CancellationToken cancellationToken = default);
 
         Task AddAsync(Notar notar, CancellationToken cancellationToken = default);
 

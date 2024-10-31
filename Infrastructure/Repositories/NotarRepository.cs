@@ -29,7 +29,7 @@ namespace Infrastructure.Repositories
                Remove(notar!);            
         }
 
-        public async Task<PagedResponse<Notar>> GetAllAsync(Pagination pagination, CancellationToken cancellationToken = default)
+        public async Task<Result<PagedResponse<Notar>>> GetAllAsync(Pagination pagination, CancellationToken cancellationToken = default)
         {
             return await _dbContext.Set<Notar>()
                 .AsNoTracking()

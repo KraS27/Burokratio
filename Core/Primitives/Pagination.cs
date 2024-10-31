@@ -1,12 +1,9 @@
 namespace Core.Primitives;
 
-public struct Pagination
-
+public class Pagination
 {
-    public Pagination()
-    {
-    }
-
+    public const int MAX_PAGE_SIZE = 30;
+    
     public int PageNumber { get; set; } = 1;
     
     public int PageSize { get; set; } = 15;
