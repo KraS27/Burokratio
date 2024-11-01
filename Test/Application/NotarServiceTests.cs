@@ -1,6 +1,7 @@
 using Application.DTO.Notar;
 using Application.Interfaces;
 using Application.Services;
+using AutoMapper;
 using Core.Entities;
 using Core.Errors;
 using Core.ValueObjects;
@@ -27,13 +28,15 @@ public class NotarServiceTests
     
     private readonly Mock<INotarRepository> _notarRepositoryMock;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+    private readonly Mock<IMapper> _mapperMock;
     private readonly NotarService _notarService;
 
     public NotarServiceTests()
     {
         _notarRepositoryMock = new Mock<INotarRepository>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
-        _notarService = new NotarService(_notarRepositoryMock.Object, _unitOfWorkMock.Object);
+        _mapperMock = new Mock<IMapper>();
+        _notarService = new NotarService(_notarRepositoryMock.Object, _unitOfWorkMock.Object, _mapperMock.Object);
     }
 
     [Fact]

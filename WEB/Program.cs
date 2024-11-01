@@ -1,3 +1,4 @@
+using Application.Extensions.Automapper.Notar;
 using Application.Interfaces;
 using Application.Services;
 using Infrastructure;
@@ -19,6 +20,7 @@ namespace WEB
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connection));
+            builder.Services.AddAutoMapper(typeof(NotarMappingProfile));
 
             builder.Services.AddScoped<NotarService>();
             builder.Services.AddScoped<INotarRepository, NotarRepository>();

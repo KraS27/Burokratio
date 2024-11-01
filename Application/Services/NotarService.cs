@@ -1,5 +1,6 @@
 ﻿using Application.DTO.Notar;
 using Application.Interfaces;
+using AutoMapper;
 using Core.Entities;
 using Core.Errors;
 using Core.Primitives;
@@ -11,20 +12,25 @@ namespace Application.Services
     {
         private readonly INotarRepository _notarRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public NotarService(INotarRepository notarRepository, IUnitOfWork unitOfWork)
+        public NotarService(INotarRepository notarRepository, IUnitOfWork unitOfWork, IMapper mapper)
         {
             _notarRepository = notarRepository;
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
-        public async Task<Result<Notar?>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+        public async Task<Result<NotarResponse?>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            var notar = await _notarRepository.GetByIdAsync(id, cancellationToken);
-
+            var notar = await _notarRepository
+                .GetByIdAsync(id, cancellationToken);
+            
             if (notar == null)
                 NotarErrors.NotFound(id);
+            
+            var notarResponse = _mapper.Map<NotarResponse?>(notar);
 
-            return notar;
+            return notarResponse;
         }
         public async Task<Result<PagedResponse<NotarResponse>>> GetAllAsync(Pagination pagination, CancellationToken cancellationToken)
         {
@@ -42,7 +48,7 @@ namespace Application.Services
            if (emailAndPhoneResult.IsFailure)
                return emailAndPhoneResult.Error!;
            
-           (Email email, PhoneNumber phone) = emailAndPhoneResult.Value!;
+           (Email email, PhoneNumber phone) = emailAndPhoneResult.Value;
            
             var addressResult = Address.Create(request.division, request.country, request.city, request.street, request.postalCode);
             var coordinatesResult = Coordinates.Create(request.latitude, request.longitude);
@@ -130,7 +136,7 @@ namespace Application.Services
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return Result.Success();
         }       
-        private async Task<Result<(Email email, PhoneNumber? phoneNumber)>> CheckEmailAndPhoneAsync(string email, string phone, CancellationToken cancellationToken)
+        private async Task<Result<(Email email, PhoneNumber phoneNumber)>> CheckEmailAndPhoneAsync(string email, string phone, CancellationToken cancellationToken)
         {
             var emailResult = Email.Create(email);
             var phoneResult = PhoneNumber.Create(phone);
@@ -146,7 +152,7 @@ namespace Application.Services
             if(notar != null && notar.PhoneNumber.Equals(phoneResult.Value))
                 return NotarErrors.PhoneNumberConflict(notar.PhoneNumber.Value);
             
-            return Result<(Email email, PhoneNumber? phoneNumber)>.Success((emailResult.Value!, phoneResult.Value!));
+            return Result<(Email email, PhoneNumber phoneNumber)>.Success((emailResult.Value!, phoneResult.Value!));
         }
         private async Task<Result<Email>> CheckEmailAsync(string email, CancellationToken cancellationToken)
         {
@@ -172,7 +178,7 @@ namespace Application.Services
             var notar = await _notarRepository.GetByPhoneAsync(phoneResult.Value!, cancellationToken);
 
             if (notar != null)
-                return NotarErrors.PhoneNumberConflict(notar.PhoneNumber!.Value);
+                return NotarErrors.PhoneNumberConflict(notar.PhoneNumber.Value);
 
             return phoneResult;
         }
