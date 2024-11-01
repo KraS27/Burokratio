@@ -26,14 +26,14 @@ namespace Application.Services
 
             return notar;
         }
-        public async Task<Result<PagedResponse<Notar>>> GetAllAsync(Pagination pagination, CancellationToken cancellationToken)
+        public async Task<Result<PagedResponse<NotarResponse>>> GetAllAsync(Pagination pagination, CancellationToken cancellationToken)
         {
             var result = await _notarRepository.GetAllAsync(pagination, cancellationToken);
 
             if (result.IsFailure)
                 return result.Error!;
             
-            return Result<PagedResponse<Notar>>.Success(result.Value!);
+            return Result<PagedResponse<NotarResponse>>.Success(result.Value!);
         }
         public async Task<Result<Guid>> AddAsync(CreateNotarRequest request, CancellationToken cancellationToken)
         {

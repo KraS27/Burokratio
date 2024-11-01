@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using Application.DTO.Notar;
 using Application.Interfaces;
 using Core.Entities;
 using Core.Primitives;
@@ -29,10 +30,22 @@ namespace Infrastructure.Repositories
                Remove(notar!);            
         }
 
-        public async Task<Result<PagedResponse<Notar>>> GetAllAsync(Pagination pagination, CancellationToken cancellationToken = default)
+        public async Task<Result<PagedResponse<NotarResponse>>> GetAllAsync(Pagination pagination, CancellationToken cancellationToken = default)
         {
             return await _dbContext.Set<Notar>()
                 .AsNoTracking()
+                .Select(x => new NotarResponse(
+                    x.Id,
+                    x.Name,
+                    x.Address.Division,
+                    x.Address.Country,
+                    x.Address.City,
+                    x.Address.Street,
+                    x.Address.PostalCode,
+                    x.Coordinates.Latitude,
+                    x.Coordinates.Longitude,
+                    x.Email.Value,
+                    x.PhoneNumber.Value))
                 .ToPagedResponseAsync(pagination);
         }
 

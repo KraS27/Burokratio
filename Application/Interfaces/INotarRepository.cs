@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using Application.DTO.Notar;
 using Core.Entities;
 using Core.Primitives;
 using Core.ValueObjects;
@@ -15,7 +16,7 @@ namespace Application.Interfaces
 
         Task<Notar?> GetByPhoneAsync(PhoneNumber number, CancellationToken cancellationToken = default);
 
-        Task<Result<PagedResponse<Notar>>> GetAllAsync(Pagination pagination, CancellationToken cancellationToken = default);
+        Task<Result<PagedResponse<NotarResponse>>> GetAllAsync(Pagination pagination, CancellationToken cancellationToken = default);
 
         Task AddAsync(Notar notar, CancellationToken cancellationToken = default);
 
