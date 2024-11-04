@@ -9,7 +9,7 @@ using FluentAssertions;
 using Moq;
 using Xunit;
 
-namespace TEST;
+namespace TEST.Application;
 
 public class NotarServiceTests
 {
@@ -47,7 +47,7 @@ public class NotarServiceTests
             "Existing Notar",
             Address.Create("Division", "Country", "City", "Street", "12345").Value!,
             Coordinates.Create(45.0, -93.0).Value!,
-            Email.Create(createRequest.email).Value!,
+            Email.Create(createRequest.Email).Value!,
             PhoneNumber.Create("+45125112").Value!
         ).Value!;
 
@@ -60,7 +60,7 @@ public class NotarServiceTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be(NotarErrors.EmailConflict(createRequest.email));
+        result.Error.Should().Be(NotarErrors.EmailConflict(createRequest.Email));
     }
 
     [Fact]
@@ -72,7 +72,7 @@ public class NotarServiceTests
             Address.Create("Division", "Country", "City", "Street", "12345").Value!,
             Coordinates.Create(45.0, -93.0).Value!,
             Email.Create("test@gmail.com").Value!,
-            PhoneNumber.Create(createRequest.phoneNumber).Value!
+            PhoneNumber.Create(createRequest.PhoneNumber).Value!
         ).Value!;
         
         _notarRepositoryMock
@@ -84,7 +84,7 @@ public class NotarServiceTests
         
         //Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be(NotarErrors.PhoneNumberConflict(createRequest.phoneNumber));
+        result.Error.Should().Be(NotarErrors.PhoneNumberConflict(createRequest.PhoneNumber));
     }
 
     [Fact]
@@ -95,8 +95,8 @@ public class NotarServiceTests
             "Existing Notar",
             Address.Create("Division", "Country", "City", "Street", "12345").Value!,
             Coordinates.Create(45.0, -93.0).Value!,
-            Email.Create(createRequest.email).Value!,
-            PhoneNumber.Create(createRequest.phoneNumber).Value!
+            Email.Create(createRequest.Email).Value!,
+            PhoneNumber.Create(createRequest.PhoneNumber).Value!
         ).Value!;
         
         _notarRepositoryMock

@@ -35,29 +35,39 @@ namespace Application.Services
         public async Task<Result<PagedResponse<NotarResponse>>> GetAllAsync(Pagination pagination, CancellationToken cancellationToken)
         {
             var result = await _notarRepository.GetAllAsync(pagination, cancellationToken);
-
+            
             if (result.IsFailure)
                 return result.Error!;
+
+            var resultValue = result.Value!;
+
+            var response = new PagedResponse<NotarResponse>
+            {
+                TotalCount = resultValue.TotalCount,
+                PageSize = resultValue.PageSize,
+                CurrentPage = resultValue.CurrentPage,
+                Items = _mapper.Map<List<NotarResponse>>(resultValue.Items)
+            };
             
-            return Result<PagedResponse<NotarResponse>>.Success(result.Value!);
+            return Result<PagedResponse<NotarResponse>>.Success(response);
         }
         public async Task<Result<Guid>> AddAsync(CreateNotarRequest request, CancellationToken cancellationToken)
         {
-           var emailAndPhoneResult =  await CheckEmailAndPhoneAsync(request.email, request.phoneNumber,cancellationToken);
+           var emailAndPhoneResult =  await CheckEmailAndPhoneAsync(request.Email, request.PhoneNumber,cancellationToken);
 
            if (emailAndPhoneResult.IsFailure)
                return emailAndPhoneResult.Error!;
            
            (Email email, PhoneNumber phone) = emailAndPhoneResult.Value;
            
-            var addressResult = Address.Create(request.division, request.country, request.city, request.street, request.postalCode);
-            var coordinatesResult = Coordinates.Create(request.latitude, request.longitude);
+            var addressResult = Address.Create(request.Division, request.Country, request.City, request.Street, request.PostalCode);
+            var coordinatesResult = Coordinates.Create(request.Latitude, request.Longitude);
 
             if(addressResult.IsFailure || coordinatesResult.IsFailure)
                 return addressResult.Error ?? coordinatesResult.Error!;
             
             Result<Notar> notarResult = Notar.Create(
-                request.name, 
+                request.Name, 
                 addressResult.Value!, 
                 coordinatesResult.Value!,
                 email,
@@ -74,15 +84,15 @@ namespace Application.Services
         }     
         public async Task<Result> UdpateAsync(UpdateNotarRequest request, CancellationToken cancellationToken)
         {
-            var notar = await _notarRepository.GetByIdAsync(request.id, cancellationToken);
+            var notar = await _notarRepository.GetByIdAsync(request.Id, cancellationToken);
 
             if (notar == null)
-                return NotarErrors.NotFound(request.id);
+                return NotarErrors.NotFound(request.Id);
 
             Email email;
-            if (notar.Email.Value != request.email)
+            if (notar.Email.Value != request.Email)
             {
-                var emailResult = await CheckEmailAsync(request.email, cancellationToken);
+                var emailResult = await CheckEmailAsync(request.Email, cancellationToken);
 
                 if (emailResult.IsFailure)
                     return emailResult.Error!;
@@ -93,9 +103,9 @@ namespace Application.Services
                 email = notar.Email;
             
             PhoneNumber phoneNumber;
-            if (notar.PhoneNumber.Value != request.phoneNumber)
+            if (notar.PhoneNumber.Value != request.PhoneNumber)
             {
-                var phoneResult = await CheckPhoneAsync(request.phoneNumber, cancellationToken);
+                var phoneResult = await CheckPhoneAsync(request.PhoneNumber, cancellationToken);
 
                 if (phoneResult.IsFailure)
                     return phoneResult.Error!;
@@ -105,14 +115,13 @@ namespace Application.Services
             else
                 phoneNumber = notar.PhoneNumber;
             
-            
-            var addressResult = Address.Create(request.division, request.country, request.city, request.street, request.postalCode);
-            var coordinatesResult = Coordinates.Create(request.latitude, request.longitude);
+            var addressResult = Address.Create(request.Division, request.Country, request.City, request.Street, request.PostalCode);
+            var coordinatesResult = Coordinates.Create(request.Latitude, request.Longitude);
 
             if (addressResult.IsFailure || coordinatesResult.IsFailure)
                 return addressResult.Error ?? coordinatesResult.Error!;
 
-            var updateResult = notar.Update(request.name,
+            var updateResult = notar.Update(request.Name,
                 addressResult.Value!,
                 coordinatesResult.Value!,
                 email,

@@ -1,4 +1,4 @@
-using Application.Extensions.Automapper.Notar;
+using Application.Extensions.Automapper.Notars;
 using Application.Interfaces;
 using Application.Services;
 using Infrastructure;
