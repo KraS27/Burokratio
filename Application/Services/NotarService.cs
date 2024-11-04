@@ -34,19 +34,21 @@ namespace Application.Services
         }
         public async Task<Result<PagedResponse<NotarResponse>>> GetAllAsync(Pagination pagination, CancellationToken cancellationToken)
         {
-            var result = await _notarRepository.GetAllAsync(pagination, cancellationToken);
+            if (pagination.PageSize is < 0 or > Pagination.MAX_PAGE_SIZE)
+                return PaginationErrors.InvalidPageSize();
+        
+            if(pagination.PageNumber < 1)
+                return PaginationErrors.InvalidPageNumber();
             
-            if (result.IsFailure)
-                return result.Error!;
-
-            var resultValue = result.Value!;
-
+            var notars = await _notarRepository.GetAllAsync(pagination, cancellationToken);
+            var notarsCount = await _notarRepository.GetCountAsync(cancellationToken);
+            
             var response = new PagedResponse<NotarResponse>
             {
-                TotalCount = resultValue.TotalCount,
-                PageSize = resultValue.PageSize,
-                CurrentPage = resultValue.CurrentPage,
-                Items = _mapper.Map<List<NotarResponse>>(resultValue.Items)
+                TotalCount = notarsCount,
+                PageSize = pagination.PageSize,
+                CurrentPage = pagination.PageNumber,
+                Items = _mapper.Map<List<NotarResponse>>(notars)
             };
             
             return Result<PagedResponse<NotarResponse>>.Success(response);
@@ -82,7 +84,7 @@ namespace Application.Services
 
             return notarResult.Value!.Id;
         }     
-        public async Task<Result> UdpateAsync(UpdateNotarRequest request, CancellationToken cancellationToken)
+        public async Task<Result> UpdateAsync(UpdateNotarRequest request, CancellationToken cancellationToken)
         {
             var notar = await _notarRepository.GetByIdAsync(request.Id, cancellationToken);
 

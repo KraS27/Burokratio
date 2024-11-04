@@ -44,7 +44,7 @@ namespace WEB.Controllers
         [HttpPut]
         public async Task<IResult> Update([FromBody] UpdateNotarRequest request, CancellationToken cancellationToken)
         {
-            Result result = await _notarService.UdpateAsync(request, cancellationToken);          
+            Result result = await _notarService.UpdateAsync(request, cancellationToken);          
 
             return result.IsSuccess ? Results.Ok() : result.ToProblemDetails();
         }   

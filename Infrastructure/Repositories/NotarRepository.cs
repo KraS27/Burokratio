@@ -28,13 +28,19 @@ namespace Infrastructure.Repositories
                Remove(notar!);            
         }
 
-        public async Task<Result<PagedResponse<Notar>>> GetAllAsync(Pagination pagination, CancellationToken cancellationToken = default)
+        public async Task<ICollection<Notar>> GetAllAsync(Pagination pagination, CancellationToken cancellationToken = default)
         {
             return await _dbContext.Set<Notar>()
                 .AsNoTracking()
-                .ToPagedResponseAsync(pagination);
+                .ApplyPaginationAsync(pagination);
         }
 
+        public async Task<int> GetCountAsync(CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Set<Notar>().CountAsync(cancellationToken);
+        }
+        
+        
         public async Task<Notar?> GetByEmailOrPhoneAsync(Email email, PhoneNumber phoneNumber, CancellationToken cancellationToken = default)
         {
             return await _dbContext.Set<Notar>()
