@@ -32,14 +32,6 @@ namespace WEB.Controllers
 
             return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblemDetails();
         }
-
-        [HttpPost]
-        public async Task<IResult> Add([FromBody] CreateNotarRequest request, CancellationToken cancellationToken)
-        {
-            Result<Guid> result = await _notarService.AddAsync(request, cancellationToken);          
-
-            return result.IsSuccess ? Results.Ok(result.Value) : result.ToProblemDetails();
-        }        
         
         [HttpPut]
         public async Task<IResult> Update([FromBody] UpdateNotarRequest request, CancellationToken cancellationToken)

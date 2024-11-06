@@ -26,7 +26,7 @@ namespace Application.Services
                 .GetByIdAsync(id, cancellationToken);
             
             if (notar == null)
-                NotarErrors.NotFound(id);
+                NotarErrors.IdNotFound(id);
             
             var notarResponse = _mapper.Map<NotarResponse?>(notar);
 
@@ -53,43 +53,12 @@ namespace Application.Services
             
             return Result<PagedResponse<NotarResponse>>.Success(response);
         }
-        public async Task<Result<Guid>> AddAsync(CreateNotarRequest request, CancellationToken cancellationToken)
-        {
-           var emailAndPhoneResult =  await CheckEmailAndPhoneAsync(request.Email, request.PhoneNumber,cancellationToken);
-
-           if (emailAndPhoneResult.IsFailure)
-               return emailAndPhoneResult.Error!;
-           
-           (Email email, PhoneNumber phone) = emailAndPhoneResult.Value;
-           
-            var addressResult = Address.Create(request.Division, request.Country, request.City, request.Street, request.PostalCode);
-            var coordinatesResult = Coordinates.Create(request.Latitude, request.Longitude);
-
-            if(addressResult.IsFailure || coordinatesResult.IsFailure)
-                return addressResult.Error ?? coordinatesResult.Error!;
-            
-            Result<Notar> notarResult = Notar.Create(
-                request.Name, 
-                addressResult.Value!, 
-                coordinatesResult.Value!,
-                email,
-                phone
-                ).Value!;
-
-            if (notarResult.IsFailure)
-                return notarResult.Error!;
-
-            await _notarRepository.AddAsync(notarResult.Value!, cancellationToken);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-            return notarResult.Value!.Id;
-        }     
         public async Task<Result> UpdateAsync(UpdateNotarRequest request, CancellationToken cancellationToken)
         {
             var notar = await _notarRepository.GetByIdAsync(request.Id, cancellationToken);
 
             if (notar == null)
-                return NotarErrors.NotFound(request.Id);
+                return NotarErrors.IdNotFound(request.Id);
 
             Email email;
             if (notar.Email.Value != request.Email)
@@ -124,6 +93,7 @@ namespace Application.Services
                 return addressResult.Error ?? coordinatesResult.Error!;
 
             var updateResult = notar.Update(request.Name,
+                request.Password,
                 addressResult.Value!,
                 coordinatesResult.Value!,
                 email,
@@ -141,30 +111,12 @@ namespace Application.Services
             var notar = await _notarRepository.GetByIdAsync(id, cancellationToken);
 
             if (notar == null)
-                return NotarErrors.NotFound(id);
+                return NotarErrors.IdNotFound(id);
 
             await _notarRepository.DeleteAsync(notar, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return Result.Success();
         }       
-        private async Task<Result<(Email email, PhoneNumber phoneNumber)>> CheckEmailAndPhoneAsync(string email, string phone, CancellationToken cancellationToken)
-        {
-            var emailResult = Email.Create(email);
-            var phoneResult = PhoneNumber.Create(phone);
-            
-            if (emailResult.IsFailure || phoneResult.IsFailure)
-                return emailResult.Error ?? phoneResult.Error!;
-            
-            var notar = await _notarRepository.GetByEmailOrPhoneAsync(emailResult.Value!, phoneResult.Value!, cancellationToken);
-            
-            if (notar != null && notar.Email.Equals(emailResult.Value))
-              return NotarErrors.EmailConflict(notar.Email.Value);
-            
-            if(notar != null && notar.PhoneNumber.Equals(phoneResult.Value))
-                return NotarErrors.PhoneNumberConflict(notar.PhoneNumber.Value);
-            
-            return Result<(Email email, PhoneNumber phoneNumber)>.Success((emailResult.Value!, phoneResult.Value!));
-        }
         private async Task<Result<Email>> CheckEmailAsync(string email, CancellationToken cancellationToken)
         {
             var emailResult = Email.Create(email);

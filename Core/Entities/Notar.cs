@@ -7,9 +7,15 @@ namespace Core.Entities
     public class Notar : Entity
     {
         public const int MAX_NAME_LENGTH = 256;
+        
+        public const int MAX_PASSWORD_LENGTH = 16;
+        
+        public const int MIN_PASSWORD_LENGTH = 8;
 
         public string Name { get; private set; } = null!;
 
+        public string Password { get; private set; } = null!;
+        
         public Address Address { get; private set; } = null!;
 
         public Coordinates Coordinates { get; private set; } = null!;
@@ -17,11 +23,13 @@ namespace Core.Entities
         public Email Email { get; private set; } = null!;
 
         public PhoneNumber PhoneNumber { get; private set; }
+        
 
         private Notar() { }
 
         private Notar(Guid id,
             string name,
+            string password,
             Address address,
             Coordinates coordinates,
             Email email,
@@ -30,13 +38,16 @@ namespace Core.Entities
             DateTime updatedAt)
         {
             Name = name;
+            Password = password;
             Address = address;
             Coordinates = coordinates;
             Email = email;
             PhoneNumber = phoneNumber;
         }
 
-        public static Result<Notar> Create(string name,
+        public static Result<Notar> Create(
+            string name,
+            string password,
             Address address,
             Coordinates coordinates,
             Email email,
@@ -48,6 +59,7 @@ namespace Core.Entities
             var notar = new Notar(
                 Guid.NewGuid(),
                 name,
+                password,
                 address,
                 coordinates,
                 email,
@@ -58,7 +70,9 @@ namespace Core.Entities
             return notar;
         }
         
-        public Result Update(string name,
+        public Result Update(
+            string name,
+            string password,
             Address address,
             Coordinates coordinates,
             Email email,
@@ -68,6 +82,7 @@ namespace Core.Entities
                 return NotarErrors.InvalidName();
 
             Name = name;
+            Password = password;
             Address = address;
             Coordinates = coordinates;
             Email = email;
