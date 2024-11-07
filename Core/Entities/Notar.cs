@@ -24,7 +24,8 @@ namespace Core.Entities
 
         public PhoneNumber PhoneNumber { get; private set; }
         
-
+        public bool IsAuthorized { get; private set; }
+        
         private Notar() { }
 
         private Notar(Guid id,
@@ -35,7 +36,9 @@ namespace Core.Entities
             Email email,
             PhoneNumber phoneNumber,
             DateTime createdAt,
-            DateTime updatedAt)
+            DateTime updatedAt,
+            bool isAuthorized
+            )
         {
             Name = name;
             Password = password;
@@ -65,7 +68,8 @@ namespace Core.Entities
                 email,
                 phoneNumber,
                 DateTime.Now,
-                DateTime.Now);
+                DateTime.Now,
+                true);
 
             return notar;
         }

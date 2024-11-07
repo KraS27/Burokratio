@@ -16,7 +16,7 @@ public class AuthController : ControllerBase
         _authService = authService;
     }
 
-    [HttpPost("/register")]
+    [HttpPost("/register")] 
     public async Task<IResult> Register([FromBody] RegisterNotarRequest request, CancellationToken cancellationToken)
     {
         var result = await _authService.RegisterNotarAsync(request, cancellationToken);

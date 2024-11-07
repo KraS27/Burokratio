@@ -19,6 +19,10 @@ namespace Infrastructure.Configurations
             builder.Property(n => n.Name)
                 .HasColumnName("name")
                 .HasMaxLength(Notar.MAX_NAME_LENGTH);
+            
+            builder.Property(n => n.Password)
+                .HasColumnName("password")
+                .HasMaxLength(Notar.MAX_PASSWORD_LENGTH);
 
             builder.ComplexProperty(n => n.Address, b =>
             {
@@ -81,6 +85,9 @@ namespace Infrastructure.Configurations
             builder.Property(n => n.UpdatedAt)
                 .IsRequired()
                 .HasColumnName("updated_at");
+
+            builder.Property(n => n.IsAuthorized)
+                .HasDefaultValue(false);
         }
     }
 }
