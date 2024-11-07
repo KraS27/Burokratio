@@ -23,7 +23,7 @@ public class AuthService
         _jwtProvider = jwtProvider;
     }
 
-    public async Task<Result> RegisterNotarAsync(CreateNotarRequest request, CancellationToken cancellationToken)
+    public async Task<Result> RegisterNotarAsync(RegisterNotarRequest request, CancellationToken cancellationToken)
     { 
         var emailAndPhoneResult = await CheckEmailAndPhoneAsync(request.Email, request.PhoneNumber,cancellationToken);
 

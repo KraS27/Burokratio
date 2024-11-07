@@ -14,7 +14,7 @@ namespace TEST.Application;
 
 public class AuthServiceTests
 {
-    private static readonly CreateNotarRequest createRequest = new CreateNotarRequest
+    private static readonly RegisterNotarRequest RegisterRequest = new RegisterNotarRequest
     ( "John Doe",
         "unreal@52strong616&%",
         "Division",
@@ -52,7 +52,7 @@ public class AuthServiceTests
             "unreal@52strong616&%",
             Address.Create("Division", "Country", "City", "Street", "12345").Value!,
             Coordinates.Create(45.0, -93.0).Value!,
-            Email.Create(createRequest.Email).Value!,
+            Email.Create(RegisterRequest.Email).Value!,
             PhoneNumber.Create("+45125112").Value!
         ).Value!;
 
@@ -61,11 +61,11 @@ public class AuthServiceTests
             .ReturnsAsync(existingNotar);  // Return an existing Notar with the same email
 
         // Act
-        var result = await _authService.RegisterNotarAsync(createRequest, CancellationToken.None);
+        var result = await _authService.RegisterNotarAsync(RegisterRequest, CancellationToken.None);
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be(NotarErrors.EmailConflict(createRequest.Email));
+        result.Error.Should().Be(NotarErrors.EmailConflict(RegisterRequest.Email));
     }
 
     [Fact]
@@ -78,7 +78,7 @@ public class AuthServiceTests
             Address.Create("Division", "Country", "City", "Street", "12345").Value!,
             Coordinates.Create(45.0, -93.0).Value!,
             Email.Create("test@gmail.com").Value!,
-            PhoneNumber.Create(createRequest.PhoneNumber).Value!
+            PhoneNumber.Create(RegisterRequest.PhoneNumber).Value!
         ).Value!;
         
         _notarRepositoryMock
@@ -86,11 +86,11 @@ public class AuthServiceTests
             .ReturnsAsync(existingNotar);  // Return an existing Notar with the same phone
         
         //Act
-        var result = await _authService.RegisterNotarAsync(createRequest, CancellationToken.None);
+        var result = await _authService.RegisterNotarAsync(RegisterRequest, CancellationToken.None);
         
         //Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be(NotarErrors.PhoneNumberConflict(createRequest.PhoneNumber));
+        result.Error.Should().Be(NotarErrors.PhoneNumberConflict(RegisterRequest.PhoneNumber));
     }
 
     [Fact]
@@ -102,8 +102,8 @@ public class AuthServiceTests
             "unreal@52strong616&%",
             Address.Create("Division", "Country", "City", "Street", "12345").Value!,
             Coordinates.Create(45.0, -93.0).Value!,
-            Email.Create(createRequest.Email).Value!,
-            PhoneNumber.Create(createRequest.PhoneNumber).Value!
+            Email.Create(RegisterRequest.Email).Value!,
+            PhoneNumber.Create(RegisterRequest.PhoneNumber).Value!
         ).Value!;
         
         _notarRepositoryMock
@@ -115,7 +115,7 @@ public class AuthServiceTests
             .Returns(Task.CompletedTask);
         
         //Act
-        var result = await _authService.RegisterNotarAsync(createRequest, CancellationToken.None);
+        var result = await _authService.RegisterNotarAsync(RegisterRequest, CancellationToken.None);
         
         //Assert
         result.IsSuccess.Should().BeTrue();

@@ -1,6 +1,6 @@
 ﻿namespace Application.DTO.Notar
 {
-    public record  CreateNotarRequest(
+    public record  RegisterNotarRequest(
         string Name,
         string Password,
         string Division, string Country, string City, string Street, string PostalCode,
