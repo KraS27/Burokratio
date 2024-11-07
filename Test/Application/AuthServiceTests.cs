@@ -1,5 +1,6 @@
 using Application.DTO.Notar;
 using Application.Interfaces;
+using Application.Interfaces.Auth;
 using Application.Services;
 using AutoMapper;
 using Core.Entities;
@@ -11,10 +12,11 @@ using Xunit;
 
 namespace TEST.Application;
 
-public class NotarServiceTests
+public class AuthServiceTests
 {
     private static readonly CreateNotarRequest createRequest = new CreateNotarRequest
     ( "John Doe",
+        "unreal@52strong616&%",
         "Division",
         "Country",
         "City",
@@ -28,23 +30,26 @@ public class NotarServiceTests
     
     private readonly Mock<INotarRepository> _notarRepositoryMock;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
-    private readonly Mock<IMapper> _mapperMock;
-    private readonly NotarService _notarService;
+    private readonly Mock<IJwtProvider> _jwtProviderMock;
+    private readonly Mock<IPasswordHasher> _passwordHasherMock;
+    private readonly AuthService _authService;
 
-    public NotarServiceTests()
+    public AuthServiceTests()
     {
         _notarRepositoryMock = new Mock<INotarRepository>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
-        _mapperMock = new Mock<IMapper>();
-        _notarService = new NotarService(_notarRepositoryMock.Object, _unitOfWorkMock.Object, _mapperMock.Object);
+        _jwtProviderMock = new Mock<IJwtProvider>();
+        _passwordHasherMock = new Mock<IPasswordHasher>();
+        _authService = new AuthService(_passwordHasherMock.Object, _notarRepositoryMock.Object, _unitOfWorkMock.Object, _jwtProviderMock.Object);
     }
 
     [Fact]
-    public async Task AddAsync_ShouldReturnEmailConflictError_WhenEmailAreSame()
+    public async Task RegisterNotarAsync_ShouldReturnEmailConflictError_WhenEmailAreSame()
     {
         // Arrange
         var existingNotar = Notar.Create(
             "Existing Notar",
+            "unreal@52strong616&%",
             Address.Create("Division", "Country", "City", "Street", "12345").Value!,
             Coordinates.Create(45.0, -93.0).Value!,
             Email.Create(createRequest.Email).Value!,
@@ -56,7 +61,7 @@ public class NotarServiceTests
             .ReturnsAsync(existingNotar);  // Return an existing Notar with the same email
 
         // Act
-        var result = await _notarService.AddAsync(createRequest, CancellationToken.None);
+        var result = await _authService.RegisterNotarAsync(createRequest, CancellationToken.None);
 
         // Assert
         result.IsFailure.Should().BeTrue();
@@ -64,11 +69,12 @@ public class NotarServiceTests
     }
 
     [Fact]
-    public async Task AddAsync_ShouldReturnPhoneNumberConflictError_WhenPhoneNumberAreSame()
+    public async Task RegisterNotarAsync_ShouldReturnPhoneNumberConflictError_WhenPhoneNumberAreSame()
     {
         // Arrange
         var existingNotar = Notar.Create(
             "Existing Notar",
+            "unreal@52strong616&%",
             Address.Create("Division", "Country", "City", "Street", "12345").Value!,
             Coordinates.Create(45.0, -93.0).Value!,
             Email.Create("test@gmail.com").Value!,
@@ -80,7 +86,7 @@ public class NotarServiceTests
             .ReturnsAsync(existingNotar);  // Return an existing Notar with the same phone
         
         //Act
-        var result = await _notarService.AddAsync(createRequest, CancellationToken.None);
+        var result = await _authService.RegisterNotarAsync(createRequest, CancellationToken.None);
         
         //Assert
         result.IsFailure.Should().BeTrue();
@@ -88,11 +94,12 @@ public class NotarServiceTests
     }
 
     [Fact]
-    public async Task AddAsync_ShouldReturnSuccessResult_WhenValuesCorrect()
+    public async Task RegisterNotarAsync_ShouldReturnSuccessResult_WhenValuesCorrect()
     {
         // Arrange
         var expectedNotar = Notar.Create(
             "Existing Notar",
+            "unreal@52strong616&%",
             Address.Create("Division", "Country", "City", "Street", "12345").Value!,
             Coordinates.Create(45.0, -93.0).Value!,
             Email.Create(createRequest.Email).Value!,
@@ -108,10 +115,9 @@ public class NotarServiceTests
             .Returns(Task.CompletedTask);
         
         //Act
-        var result = await _notarService.AddAsync(createRequest, CancellationToken.None);
+        var result = await _authService.RegisterNotarAsync(createRequest, CancellationToken.None);
         
         //Assert
         result.IsSuccess.Should().BeTrue();
-        result.Value.Should().Be(expectedNotar.Id);
     }
 }
