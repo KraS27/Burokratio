@@ -30,9 +30,14 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<DateTimeOffset>("CreatedAt")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
+
+                    b.Property<bool>("IsAuthorized")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -40,7 +45,12 @@ namespace Infrastructure.Migrations
                         .HasColumnType("character varying(256)")
                         .HasColumnName("name");
 
-                    b.Property<DateTimeOffset>("UpdatedAt")
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("password");
+
+                    b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
@@ -107,7 +117,7 @@ namespace Infrastructure.Migrations
                         {
                             b1.IsRequired();
 
-                            b1.Property<string>("Number")
+                            b1.Property<string>("Value")
                                 .IsRequired()
                                 .HasMaxLength(32)
                                 .HasColumnType("character varying(32)")

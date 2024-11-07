@@ -19,10 +19,9 @@ namespace Infrastructure.Configurations
             builder.Property(n => n.Name)
                 .HasColumnName("name")
                 .HasMaxLength(Notar.MAX_NAME_LENGTH);
-            
+
             builder.Property(n => n.Password)
-                .HasColumnName("password")
-                .HasMaxLength(Notar.MAX_PASSWORD_LENGTH);
+                .HasColumnName("password");
 
             builder.ComplexProperty(n => n.Address, b =>
             {

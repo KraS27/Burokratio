@@ -12,7 +12,7 @@ namespace Core.Errors
         public static Error IdNotFound(Guid id) =>
             Error.NotFound($"Notar with id: {id} not found.");
 
-        public static Error EmailNotFound(Email email) =>
+        public static Error EmailNotFound(string email) =>
             Error.NotFound($"Notar with email: {email} not found.");
         
         public static Error EmailConflict(string email) =>

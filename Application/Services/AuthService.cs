@@ -92,7 +92,7 @@ public class AuthService
         var notar = await _notarRepository.GetByEmailAsync(emailResult.Value!, cancellationToken);
         
         if(notar == null)
-            return NotarErrors.EmailNotFound(notar!.Email);
+            return NotarErrors.EmailNotFound(request.Email);
         
         var passwordResult = _passwordHasher.VerifyHash(notar.Password, request.Password);
 
