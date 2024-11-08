@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Application.DTO.Security;
 using Application.Interfaces.Auth;
 using Core.Entities;
 using Microsoft.Extensions.Options;
@@ -17,10 +18,10 @@ public class JwtProvider : IJwtProvider
         _options = options.Value;
     }
 
-    public string GenerateNotarToken(Notar notar)
+    public JwtResponse GenerateNotarToken(Notar notar)
     {
         var signingCredentials = new SigningCredentials(
-            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key)), SecurityAlgorithms.Sha256);
+            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key)), SecurityAlgorithms.HmacSha256);
 
         var claims = new Claim[] { new("notarId", notar.Id.ToString()) };
 
@@ -30,7 +31,9 @@ public class JwtProvider : IJwtProvider
             expires: DateTime.UtcNow.AddHours(_options.ExpiredHours));
 
         var tokenValue = new JwtSecurityTokenHandler().WriteToken(token);
-
-        return tokenValue;
+        
+        var response = new JwtResponse(tokenValue, DateTime.Now.AddHours(_options.ExpiredHours), string.Empty);
+        
+        return response;
     }
 }

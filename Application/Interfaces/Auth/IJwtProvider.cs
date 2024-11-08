@@ -1,8 +1,9 @@
+using Application.DTO.Security;
 using Core.Entities;
 
 namespace Application.Interfaces.Auth;
 
 public interface IJwtProvider
 {
-    public string GenerateNotarToken(Notar notar);
+    public JwtResponse GenerateNotarToken(Notar notar);
 }

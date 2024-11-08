@@ -1,4 +1,5 @@
 using Application.DTO.Notar;
+using Application.DTO.Security;
 using Application.Interfaces;
 using Application.Interfaces.Auth;
 using Core.Entities;
@@ -82,7 +83,7 @@ public class AuthService
         return Result<(Email email, PhoneNumber phoneNumber)>.Success((emailResult.Value!, phoneResult.Value!));
     }
     
-    public async Task<Result<string>> LoginNotarAsync(LoginNotarRequest request, CancellationToken cancellationToken)
+    public async Task<Result<JwtResponse>> LoginNotarAsync(LoginNotarRequest request, CancellationToken cancellationToken)
     {
         var emailResult = Email.Create(request.Email);
         
@@ -99,8 +100,8 @@ public class AuthService
         if (passwordResult == false)
             NotarErrors.InvalidPassword();
 
-        var token = _jwtProvider.GenerateNotarToken(notar);
+        var tokenResponse = _jwtProvider.GenerateNotarToken(notar);
 
-        return token;
+        return tokenResponse;
     }
 }

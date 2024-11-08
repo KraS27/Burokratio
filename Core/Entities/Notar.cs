@@ -46,6 +46,9 @@ namespace Core.Entities
             Coordinates = coordinates;
             Email = email;
             PhoneNumber = phoneNumber;
+            CreatedAt = createdAt;
+            UpdatedAt = updatedAt;
+            IsAuthorized = isAuthorized;    
         }
 
         public static Result<Notar> Create(
@@ -67,8 +70,8 @@ namespace Core.Entities
                 coordinates,
                 email,
                 phoneNumber,
-                DateTime.Now,
-                DateTime.Now,
+                DateTime.UtcNow,
+                DateTime.UtcNow,
                 true);
 
             return notar;
